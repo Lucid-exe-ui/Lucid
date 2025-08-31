@@ -6,82 +6,124 @@
   <title>Invite Only Cheat Login</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #1c1c1c;
-      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #181a1f;
+      color: #eee;
+      margin: 0;
+      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0;
     }
+
     .container {
-      background: #2c2c2c;
+      background-color: #242629;
       padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      width: 350px;
-      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      width: 400px;
     }
+
     h1 {
       margin-bottom: 20px;
       font-size: 24px;
+      font-weight: normal;
     }
+
+    .input-group {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .input-group label {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 5px;
+    }
+
     input {
-      width: 90%;
       padding: 10px;
-      margin: 10px 0;
       border-radius: 6px;
-      border: none;
-      font-size: 16px;
+      border: 1px solid #3a3c42;
+      background-color: #1e1f23;
+      color: #eee;
+      font-size: 14px;
     }
+
+    input::placeholder {
+      color: #555;
+    }
+
     button {
-      width: 95%;
+      width: 100%;
       padding: 12px;
-      margin-top: 10px;
+      background-color: #3a80f7;
       border: none;
       border-radius: 6px;
-      background: #ff4c4c;
       color: white;
       font-size: 16px;
       cursor: pointer;
-    }
-    button:hover {
-      background: #ff1c1c;
-    }
-    .message {
-      margin-top: 15px;
-      color: #ff7777;
-      font-size: 14px;
-    }
-    .toggle-btn {
-      background: transparent;
-      color: #aaa;
-      border: none;
-      cursor: pointer;
       margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #2a65c7;
+    }
+
+    .message {
+      margin-top: 10px;
+      color: #ff4c4c;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .toggle-btn {
+      margin-top: 15px;
+      background: transparent;
+      border: none;
+      color: #888;
+      cursor: pointer;
       text-decoration: underline;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <div class="container" id="login-container">
-    <h1>Invite Only Cheat Login</h1>
-    <input type="text" placeholder="Email" id="login-email">
-    <input type="password" placeholder="Password" id="login-password">
-    <button onclick="fakeLogin()">Login</button>
+    <h1>Log In</h1>
+    <div class="input-group">
+      <label for="login-email">Your name or email address:</label>
+      <input type="text" id="login-email" placeholder="Email or Username">
+    </div>
+    <div class="input-group">
+      <label for="login-password">Password:</label>
+      <input type="password" id="login-password" placeholder="Password">
+    </div>
+    <button onclick="fakeLogin()">Log in</button>
     <div class="message" id="login-message"></div>
-    <button class="toggle-btn" onclick="showSignup()">Don't have an account? Sign up</button>
+    <button class="toggle-btn" onclick="showSignup()">Don't have an account? Register now</button>
   </div>
 
   <div class="container" id="signup-container" style="display:none;">
-    <h1>Sign Up</h1>
-    <input type="text" placeholder="Email" id="signup-email">
-    <input type="password" placeholder="Password" id="signup-password">
-    <input type="text" placeholder="Invite Code" id="signup-invite">
-    <button onclick="fakeSignup()">Sign Up</button>
+    <h1>Register</h1>
+    <div class="input-group">
+      <label for="signup-email">Email:</label>
+      <input type="text" id="signup-email" placeholder="Email">
+    </div>
+    <div class="input-group">
+      <label for="signup-password">Password:</label>
+      <input type="password" id="signup-password" placeholder="Password">
+    </div>
+    <div class="input-group">
+      <label for="signup-invite">Invite Code:</label>
+      <input type="text" id="signup-invite" placeholder="Invite Code">
+    </div>
+    <button onclick="fakeSignup()">Register</button>
     <div class="message" id="signup-message"></div>
-    <button class="toggle-btn" onclick="showLogin()">Already have an account? Login</button>
+    <button class="toggle-btn" onclick="showLogin()">Already have an account? Log in</button>
   </div>
 
   <script>
@@ -96,7 +138,7 @@
     }
 
     function fakeLogin() {
-      document.getElementById('login-message').innerText = "Login failed! This cheat is invite-only.";
+      document.getElementById('login-message').innerText = "You must be logged-in to do that.";
     }
 
     function fakeSignup() {
