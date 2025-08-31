@@ -69,9 +69,26 @@
     header p {
       font-size: 1rem;
       color: var(--secondary);
-      margin-bottom: 2rem;
+      margin-bottom: 1rem;
       opacity: 0.85;
       transition: color 1s;
+    }
+
+    /* Scroll hint */
+    .scroll-hint {
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      color: var(--secondary);
+      opacity: 0.7;
+      animation: pulse 1.5s infinite;
+      letter-spacing: 2px;
+      text-shadow: 0 0 5px var(--primary);
+      transition: opacity 0.5s ease;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.2; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(5px); }
     }
 
     .links {
@@ -179,6 +196,7 @@
     <header>
       <h1>Lucid</h1>
       <p>Special thanks to Burt Cocaine</p>
+      <div class="scroll-hint" id="scrollHint">▼ SCROLL ▼</div>
     </header>
 
     <section class="links">
@@ -277,6 +295,14 @@
       } else {
         document.documentElement.style.setProperty('--primary', '#ff0033'); // red alert
         document.documentElement.style.setProperty('--secondary', '#ff5555');
+      }
+
+      // Hide scroll hint after scrolling
+      const scrollHint = document.getElementById('scrollHint');
+      if (scroll > 100) {
+        scrollHint.style.opacity = "0";
+      } else {
+        scrollHint.style.opacity = "1";
       }
     });
   </script>
