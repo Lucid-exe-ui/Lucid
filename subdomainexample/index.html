@@ -22,12 +22,11 @@
     body {
       background: var(--bg);
       color: var(--primary);
-      height: 300vh; /* scroll space */
+      height: 300vh;
       transition: all 1s ease;
       overflow-x: hidden;
     }
 
-    /* MATRIX BACKGROUND */
     .matrix {
       position: fixed;
       top: 0;
@@ -39,9 +38,8 @@
     }
     canvas { display: block; }
 
-    /* CONTENT FIXED IN CENTER */
     .container {
-      position: fixed; /* locked in place */
+      position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -69,7 +67,6 @@
       transition: color 1s;
     }
 
-    /* Scroll hint */
     .scroll-hint {
       margin-top: 1.5rem;
       font-size: 1rem;
@@ -85,7 +82,6 @@
       50% { opacity: 1; transform: translateY(5px); }
     }
 
-    /* LINKS */
     .links {
       display: flex;
       flex-direction: column;
@@ -224,7 +220,7 @@
       if (music2.paused) { stopAllMusic(); music2.play(); } else { music2.pause(); }
     });
 
-    // MATRIX EFFECT WITH LUCID REVEAL
+    // MATRIX EFFECT WITH LUCID CENTER REVEAL
     const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
     canvas.height = window.innerHeight;
@@ -235,12 +231,11 @@
     const columns = Math.floor(canvas.width / fontSize);
     const drops = Array(columns).fill(1);
 
-    // Word to reveal
     const word = "LUCID";
     const wordArray = word.split('');
     const wordLength = wordArray.length;
-    const startCol = Math.floor(columns / 2 - wordLength / 2);
-    const wordRow = Math.floor(canvas.height / fontSize / 2);
+    const centerX = Math.floor(columns / 2);
+    const centerY = Math.floor(canvas.height / fontSize / 2);
 
     function draw() {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
@@ -250,18 +245,16 @@
       ctx.font = fontSize + 'px monospace';
 
       for (let i = 0; i < drops.length; i++) {
-        let text;
-
-        if (i >= startCol && i < startCol + wordLength && drops[i] === wordRow) {
-          text = wordArray[i - startCol];
-        } else {
-          text = letters[Math.floor(Math.random() * letters.length)];
-        }
-
+        const text = letters[Math.floor(Math.random() * letters.length)];
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
         drops[i]++;
+      }
+
+      // Draw "LUCID" in center
+      for (let i = 0; i < wordLength; i++) {
+        ctx.fillText(wordArray[i], (centerX - Math.floor(wordLength / 2) + i) * fontSize, centerY * fontSize);
       }
     }
 
