@@ -6,7 +6,12 @@
   <title>Lucid</title>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
-    /* Reset */
+    :root {
+      --primary: #00ff88;
+      --secondary: #0aff9d;
+      --bg: #000;
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -15,12 +20,28 @@
     }
 
     body {
-      background: #000;
-      color: #00ff88;
+      background: var(--bg);
+      color: var(--primary);
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      min-height: 300vh; /* scrolling room */
+      transition: all 1s ease;
+      overflow-x: hidden;
+    }
+
+    .matrix {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
       overflow: hidden;
+      z-index: 0;
+    }
+
+    canvas {
+      display: block;
     }
 
     .container {
@@ -29,7 +50,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 2rem;
+      padding: 4rem 2rem;
       text-align: center;
       position: relative;
       z-index: 2;
@@ -39,19 +60,20 @@
       font-size: 3rem;
       font-weight: bold;
       margin-bottom: 0.5rem;
-      color: #00ff88;
-      text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+      color: var(--primary);
+      text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
       animation: glitch 1.5s infinite;
+      transition: color 1s, text-shadow 1s;
     }
 
     header p {
       font-size: 1rem;
-      color: #0aff9d;
+      color: var(--secondary);
       margin-bottom: 2rem;
-      opacity: 0.8;
+      opacity: 0.85;
+      transition: color 1s;
     }
 
-    /* Links */
     .links {
       display: flex;
       flex-direction: column;
@@ -61,22 +83,21 @@
 
     .links a, .dropdown-btn {
       padding: 0.75rem 1.5rem;
-      background: rgba(0, 255, 136, 0.08);
-      border: 1px solid #00ff88;
-      color: #00ff88;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--primary);
+      color: var(--primary);
       border-radius: 4px;
       text-decoration: none;
-      transition: all 0.3s ease;
-      text-shadow: 0 0 5px #00ff88;
+      transition: all 0.4s ease;
+      text-shadow: 0 0 5px var(--primary);
     }
 
     .links a:hover, .dropdown-btn:hover {
-      background: rgba(0, 255, 136, 0.2);
+      background: rgba(255, 255, 255, 0.05);
       transform: scale(1.05);
-      box-shadow: 0 0 10px #00ff88;
+      box-shadow: 0 0 10px var(--primary);
     }
 
-    /* Dropdown */
     .dropdown {
       position: relative;
     }
@@ -85,7 +106,7 @@
       display: none;
       flex-direction: column;
       background: #000;
-      border: 1px solid #00ff88;
+      border: 1px solid var(--primary);
       border-radius: 4px;
       margin-top: 0.5rem;
       padding: 0.5rem 0;
@@ -101,14 +122,13 @@
       padding: 0.75rem 1rem;
       text-align: center;
       display: block;
-      color: #00ff88;
+      color: var(--primary);
     }
 
     .dropdown-content a:hover {
-      background: rgba(0, 255, 136, 0.2);
+      background: rgba(255, 255, 255, 0.05);
     }
 
-    /* Music controls */
     .music-controls {
       display: flex;
       gap: 1rem;
@@ -118,26 +138,27 @@
     .music-controls button {
       padding: 0.75rem 1.25rem;
       background: transparent;
-      border: 1px solid #00ff88;
+      border: 1px solid var(--primary);
       border-radius: 4px;
-      color: #00ff88;
+      color: var(--primary);
       font-size: 0.95rem;
       cursor: pointer;
-      transition: all 0.3s ease;
-      text-shadow: 0 0 5px #00ff88;
+      transition: all 0.4s ease;
+      text-shadow: 0 0 5px var(--primary);
     }
 
     .music-controls button:hover {
-      background: rgba(0, 255, 136, 0.2);
-      box-shadow: 0 0 10px #00ff88;
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 10px var(--primary);
     }
 
     footer {
       text-align: center;
-      padding: 1.5rem;
+      padding: 2rem;
       font-size: 0.85rem;
-      color: #0aff9d;
+      color: var(--secondary);
       z-index: 2;
+      transition: color 1s;
     }
 
     /* Glitch effect */
@@ -146,35 +167,12 @@
       20% { text-shadow: -2px -2px #ff00ff, 2px 2px #00ffff; }
       40% { text-shadow: 2px -2px #ff00ff, -2px 2px #00ffff; }
       60% { text-shadow: -2px 2px #ff00ff, 2px -2px #00ffff; }
-      80% { text-shadow: 0 0 10px #00ff88; }
+      80% { text-shadow: 0 0 10px var(--primary); }
       100% { text-shadow: 2px 2px #ff00ff, -2px -2px #00ffff; }
-    }
-
-    /* Background matrix effect */
-    .matrix {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      overflow: hidden;
-      z-index: 0;
-    }
-
-    canvas {
-      display: block;
-    }
-
-    @media (min-width: 768px) {
-      .links {
-        flex-direction: row;
-      }
     }
   </style>
 </head>
 <body>
-  <!-- Matrix Effect -->
   <div class="matrix"><canvas id="matrix"></canvas></div>
 
   <div class="container">
@@ -208,50 +206,30 @@
   </footer>
 
   <script>
+    // Dropdown toggle
     const dropdownBtn = document.querySelector('.dropdown-btn');
     const dropdownContent = document.querySelector('.dropdown-content');
-
     dropdownBtn.addEventListener('click', () => {
       dropdownContent.style.display = dropdownContent.style.display === 'flex' ? 'none' : 'flex';
     });
-
     window.addEventListener('click', (e) => {
-      if (!e.target.closest('.dropdown')) {
-        dropdownContent.style.display = 'none';
-      }
+      if (!e.target.closest('.dropdown')) dropdownContent.style.display = 'none';
     });
 
+    // Force new tab
     document.querySelectorAll('a').forEach(link => link.setAttribute('target', '_blank'));
 
+    // Music
     const music1 = new Audio('music.mp3');
     const music2 = new Audio('music2.mp3');
     music1.loop = true;
     music2.loop = true;
-
-    const music1Btn = document.getElementById('music1Btn');
-    const music2Btn = document.getElementById('music2Btn');
-
-    function stopAllMusic() {
-      music1.pause();
-      music2.pause();
-    }
-
-    music1Btn.addEventListener('click', () => {
-      if (music1.paused) {
-        stopAllMusic();
-        music1.play();
-      } else {
-        music1.pause();
-      }
+    function stopAllMusic() { music1.pause(); music2.pause(); }
+    document.getElementById('music1Btn').addEventListener('click', () => {
+      if (music1.paused) { stopAllMusic(); music1.play(); } else { music1.pause(); }
     });
-
-    music2Btn.addEventListener('click', () => {
-      if (music2.paused) {
-        stopAllMusic();
-        music2.play();
-      } else {
-        music2.pause();
-      }
+    document.getElementById('music2Btn').addEventListener('click', () => {
+      if (music2.paused) { stopAllMusic(); music2.play(); } else { music2.pause(); }
     });
 
     // Matrix effect
@@ -259,27 +237,21 @@
     const ctx = canvas.getContext('2d');
     canvas.height = window.innerHeight;
     canvas.width = window.innerWidth;
-
     const letters = '01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&*+-';
     const fontSize = 14;
     const columns = canvas.width / fontSize;
     const drops = [];
-
-    for (let x = 0; x < columns; x++) {
-      drops[x] = 1;
-    }
+    for (let x = 0; x < columns; x++) drops[x] = 1;
 
     function draw() {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#00ff88';
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--primary');
       ctx.font = fontSize + 'px monospace';
       for (let i = 0; i < drops.length; i++) {
         const text = letters[Math.floor(Math.random() * letters.length)];
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
         drops[i]++;
       }
     }
@@ -288,6 +260,24 @@
     window.addEventListener('resize', () => {
       canvas.height = window.innerHeight;
       canvas.width = window.innerWidth;
+    });
+
+    // Scroll-based theme changer
+    window.addEventListener('scroll', () => {
+      const scroll = window.scrollY;
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      const progress = scroll / maxScroll;
+
+      if (progress < 0.33) {
+        document.documentElement.style.setProperty('--primary', '#00ff88'); // green hacker
+        document.documentElement.style.setProperty('--secondary', '#0aff9d');
+      } else if (progress < 0.66) {
+        document.documentElement.style.setProperty('--primary', '#ff00ff'); // purple cyberpunk
+        document.documentElement.style.setProperty('--secondary', '#ff77ff');
+      } else {
+        document.documentElement.style.setProperty('--primary', '#ff0033'); // red alert
+        document.documentElement.style.setProperty('--secondary', '#ff5555');
+      }
     });
   </script>
 </body>
