@@ -3,288 +3,105 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lucid</title>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <title>Invite Only Cheat Login</title>
   <style>
-    :root {
-      --primary: #00ff88;
-      --secondary: #0aff9d;
-      --bg: #000;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Share Tech Mono', monospace;
-    }
-
     body {
-      background: var(--bg);
-      color: var(--primary);
-      height: 300vh;
-      transition: all 1s ease;
-      overflow-x: hidden;
-    }
-
-    .matrix {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      z-index: 0;
-    }
-    canvas { display: block; }
-
-    .container {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      font-family: Arial, sans-serif;
+      background: #1c1c1c;
+      color: #fff;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #2c2c2c;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      width: 350px;
       text-align: center;
-      z-index: 2;
     }
-
-    header h1 {
-      font-size: 3rem;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-      color: var(--primary);
-      text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
-      transition: color 1s, text-shadow 1s;
+    h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
     }
-
-    header p {
-      font-size: 1rem;
-      color: var(--secondary);
-      margin-bottom: 1rem;
-      opacity: 0.85;
-      transition: color 1s;
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
     }
-
-    .scroll-hint {
-      margin-top: 1.5rem;
-      font-size: 1rem;
-      color: var(--secondary);
-      opacity: 0.7;
-      animation: pulse 1.5s infinite;
-      letter-spacing: 2px;
-      text-shadow: 0 0 5px var(--primary);
-      transition: opacity 0.5s ease;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.2; transform: translateY(0); }
-      50% { opacity: 1; transform: translateY(5px); }
-    }
-
-    .links {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin: 2rem 0;
-    }
-    .links a, .dropdown-btn {
-      padding: 0.75rem 1.5rem;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid var(--primary);
-      color: var(--primary);
-      border-radius: 4px;
-      text-decoration: none;
-      transition: all 0.4s ease;
-      text-shadow: 0 0 5px var(--primary);
-    }
-    .links a:hover, .dropdown-btn:hover {
-      background: rgba(255, 255, 255, 0.05);
-      transform: scale(1.05);
-      box-shadow: 0 0 10px var(--primary);
-    }
-
-    .dropdown { position: relative; }
-    .dropdown-content {
-      display: none;
-      flex-direction: column;
-      background: #000;
-      border: 1px solid var(--primary);
-      border-radius: 4px;
-      margin-top: 0.5rem;
-      padding: 0.5rem 0;
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      min-width: 160px;
-      z-index: 10;
-    }
-    .dropdown-content a {
-      padding: 0.75rem 1rem;
-      text-align: center;
-      display: block;
-      color: var(--primary);
-    }
-    .dropdown-content a:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .music-controls {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .music-controls button {
-      padding: 0.75rem 1.25rem;
-      background: transparent;
-      border: 1px solid var(--primary);
-      border-radius: 4px;
-      color: var(--primary);
-      font-size: 0.95rem;
+    button {
+      width: 95%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #ff4c4c;
+      color: white;
+      font-size: 16px;
       cursor: pointer;
-      transition: all 0.4s ease;
-      text-shadow: 0 0 5px var(--primary);
     }
-    .music-controls button:hover {
-      background: rgba(255, 255, 255, 0.05);
-      box-shadow: 0 0 10px var(--primary);
+    button:hover {
+      background: #ff1c1c;
     }
-
-    footer {
-      position: fixed;
-      bottom: 10px;
-      width: 100%;
-      text-align: center;
-      font-size: 0.85rem;
-      color: var(--secondary);
-      z-index: 2;
-      transition: color 1s;
+    .message {
+      margin-top: 15px;
+      color: #ff7777;
+      font-size: 14px;
+    }
+    .toggle-btn {
+      background: transparent;
+      color: #aaa;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <div class="matrix"><canvas id="matrix"></canvas></div>
-
-  <div class="container">
-    <header>
-      <h1>Lucid</h1>
-      <p>Special thanks to Burt Cocaine</p>
-      <div class="scroll-hint" id="scrollHint">▼ SCROLL ▼</div>
-    </header>
-
-    <section class="links">
-      <a href="https://noveltyemails.com/fuckyou.com">YouTube</a>
-      <a href="https://discord.gg/xgBXgY4TU5">Contact</a>
-      <div class="dropdown">
-        <div class="dropdown-btn">Socials ▾</div>
-        <div class="dropdown-content">
-          <a href="https://steamcommunity.com/id/Kruhl/">Steam</a>
-          <a href="fakecrime.bio/lion">Fakecrime</a>
-          <a href="www.guns.lol/scrub">Guns.lol</a>
-        </div>
-      </div>
-    </section>
-
-    <div class="music-controls">
-      <button id="music1Btn">We’ll Let You Know</button>
-      <button id="music2Btn">Passin’ Me By</button>
-    </div>
+  <div class="container" id="login-container">
+    <h1>Invite Only Cheat Login</h1>
+    <input type="text" placeholder="Email" id="login-email">
+    <input type="password" placeholder="Password" id="login-password">
+    <button onclick="fakeLogin()">Login</button>
+    <div class="message" id="login-message"></div>
+    <button class="toggle-btn" onclick="showSignup()">Don't have an account? Sign up</button>
   </div>
 
-  <footer>&copy; 2025 Lucid. All rights reserved.</footer>
+  <div class="container" id="signup-container" style="display:none;">
+    <h1>Sign Up</h1>
+    <input type="text" placeholder="Email" id="signup-email">
+    <input type="password" placeholder="Password" id="signup-password">
+    <input type="text" placeholder="Invite Code" id="signup-invite">
+    <button onclick="fakeSignup()">Sign Up</button>
+    <div class="message" id="signup-message"></div>
+    <button class="toggle-btn" onclick="showLogin()">Already have an account? Login</button>
+  </div>
 
   <script>
-    // Dropdown toggle
-    const dropdownBtn = document.querySelector('.dropdown-btn');
-    const dropdownContent = document.querySelector('.dropdown-content');
-    dropdownBtn.addEventListener('click', () => {
-      dropdownContent.style.display = dropdownContent.style.display === 'flex' ? 'none' : 'flex';
-    });
-    window.addEventListener('click', (e) => {
-      if (!e.target.closest('.dropdown')) dropdownContent.style.display = 'none';
-    });
-
-    // Force new tab
-    document.querySelectorAll('a').forEach(link => link.setAttribute('target', '_blank'));
-
-    // Music
-    const music1 = new Audio('music.mp3');
-    const music2 = new Audio('music2.mp3');
-    music1.loop = true; music2.loop = true;
-    function stopAllMusic() { music1.pause(); music2.pause(); }
-    document.getElementById('music1Btn').addEventListener('click', () => {
-      if (music1.paused) { stopAllMusic(); music1.play(); } else { music1.pause(); }
-    });
-    document.getElementById('music2Btn').addEventListener('click', () => {
-      if (music2.paused) { stopAllMusic(); music2.play(); } else { music2.pause(); }
-    });
-
-    // MATRIX EFFECT WITH LUCID CENTER REVEAL
-    const canvas = document.getElementById('matrix');
-    const ctx = canvas.getContext('2d');
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
-
-    const letters = '01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&*+-';
-    const fontSize = 14;
-    const columns = Math.floor(canvas.width / fontSize);
-    const drops = Array(columns).fill(1);
-
-    const word = "LUCID";
-    const wordArray = word.split('');
-    const wordLength = wordArray.length;
-    const centerX = Math.floor(columns / 2);
-    const centerY = Math.floor(canvas.height / fontSize / 2);
-
-    function draw() {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--primary');
-      ctx.font = fontSize + 'px monospace';
-
-      for (let i = 0; i < drops.length; i++) {
-        const text = letters[Math.floor(Math.random() * letters.length)];
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-        drops[i]++;
-      }
-
-      // Draw "LUCID" in center
-      for (let i = 0; i < wordLength; i++) {
-        ctx.fillText(wordArray[i], (centerX - Math.floor(wordLength / 2) + i) * fontSize, centerY * fontSize);
-      }
+    function showSignup() {
+      document.getElementById('login-container').style.display = 'none';
+      document.getElementById('signup-container').style.display = 'block';
     }
 
-    setInterval(draw, 33);
+    function showLogin() {
+      document.getElementById('signup-container').style.display = 'none';
+      document.getElementById('login-container').style.display = 'block';
+    }
 
-    window.addEventListener('resize', () => {
-      canvas.height = window.innerHeight;
-      canvas.width = window.innerWidth;
-    });
+    function fakeLogin() {
+      document.getElementById('login-message').innerText = "Login failed! This cheat is invite-only.";
+    }
 
-    // Scroll-based theme changer
-    window.addEventListener('scroll', () => {
-      const scroll = window.scrollY;
-      const maxScroll = document.body.scrollHeight - window.innerHeight;
-      const progress = scroll / maxScroll;
-
-      if (progress < 0.33) {
-        document.documentElement.style.setProperty('--primary', '#00ff88'); 
-        document.documentElement.style.setProperty('--secondary', '#0aff9d');
-      } else if (progress < 0.66) {
-        document.documentElement.style.setProperty('--primary', '#ff00ff'); 
-        document.documentElement.style.setProperty('--secondary', '#ff77ff');
-      } else {
-        document.documentElement.style.setProperty('--primary', '#ff0033'); 
-        document.documentElement.style.setProperty('--secondary', '#ff5555');
-      }
-
-      const scrollHint = document.getElementById('scrollHint');
-      scrollHint.style.opacity = scroll > 100 ? "0" : "1";
-    });
+    function fakeSignup() {
+      document.getElementById('signup-message').innerText = "Signup failed! Invite code invalid.";
+    }
   </script>
 </body>
 </html>
