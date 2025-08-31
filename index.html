@@ -102,9 +102,16 @@
       transform: none;
     }
 
-    /* Music button style */
-    #musicBtn {
+    /* Music buttons */
+    .music-controls {
       margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .music-controls button {
       padding: 0.75rem 1.5rem;
       background: #4CAF50;
       color: white;
@@ -115,7 +122,7 @@
       transition: background 0.3s, transform 0.2s;
     }
 
-    #musicBtn:hover {
+    .music-controls button:hover {
       background: #45a049;
       transform: scale(1.05);
     }
@@ -160,8 +167,11 @@
       </div>
     </section>
 
-    <!-- Music button -->
-    <button id="musicBtn">Play Music</button>
+    <!-- Music controls -->
+    <div class="music-controls">
+      <button id="music1Btn">We'll let you know</button>
+      <button id="music2Btn">Passin me by</button>
+    </div>
   </div>
 
   <footer>
@@ -184,24 +194,40 @@
       }
     });
 
-    // Automatically open all links in new tab
+    // Open all links in new tab
     const allLinks = document.querySelectorAll('a');
-    allLinks.forEach(link => {
-      link.setAttribute('target', '_blank');
-    });
+    allLinks.forEach(link => link.setAttribute('target', '_blank'));
 
     // Music playback
-    const audio = new Audio('music.mp3'); // your music file in repo
-    audio.loop = true; // loop the music
-    const musicBtn = document.getElementById('musicBtn');
+    const music1 = new Audio('music.mp3');
+    const music2 = new Audio('music2.mp3');
 
-    musicBtn.addEventListener('click', () => {
-      if (audio.paused) {
-        audio.play();
-        musicBtn.textContent = 'Pause Music';
+    music1.loop = true;
+    music2.loop = true;
+
+    const music1Btn = document.getElementById('music1Btn');
+    const music2Btn = document.getElementById('music2Btn');
+
+    function stopAllMusic() {
+      music1.pause();
+      music2.pause();
+    }
+
+    music1Btn.addEventListener('click', () => {
+      if (music1.paused) {
+        stopAllMusic();
+        music1.play();
       } else {
-        audio.pause();
-        musicBtn.textContent = 'Play Music';
+        music1.pause();
+      }
+    });
+
+    music2Btn.addEventListener('click', () => {
+      if (music2.paused) {
+        stopAllMusic();
+        music2.play();
+      } else {
+        music2.pause();
       }
     });
   </script>
