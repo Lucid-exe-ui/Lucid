@@ -21,7 +21,14 @@
       flex-direction: column;
       min-height: 100vh;
       text-align: center;
-      justify-content: center; /* Center content vertically */
+    }
+
+    .centered-content {
+      flex: 1; /* Fill space between header/footer */
+      display: flex;
+      flex-direction: column;
+      justify-content: center; /* Vertical center */
+      align-items: center;     /* Horizontal center */
     }
 
     header {
@@ -46,7 +53,6 @@
       flex-direction: column;
       gap: 1rem;
       align-items: center;
-      /* Remove margin-bottom to help centering */
     }
 
     .links a {
@@ -65,7 +71,6 @@
     }
 
     footer {
-      margin-top: auto;
       padding: 2rem 1rem;
       font-size: 0.9rem;
       color: #777;
@@ -79,17 +84,19 @@
   </style>
 </head>
 <body>
-  <header>
-    <h1>Lucid</h1>
-    <p>Special thanks to Burt Cocaine</p>
-  </header>
+  <div class="centered-content">
+    <header>
+      <h1>Lucid</h1>
+      <p>Special thanks to Burt Cocaine</p>
+    </header>
 
-  <section class="links">
-    <a href="#">About</a>
-    <a href="#">Projects</a>
-    <a href="#">Contact</a>
-    <a href="https://fakecrime.bio/lion">Socials</a>
-  </section>
+    <section class="links">
+      <a href="#">About</a>
+      <a href="#">Projects</a>
+      <a href="#">Contact</a>
+      <a href="https://fakecrime.bio/lion">Socials</a>
+    </section>
+  </div>
 
   <footer>
     &copy; 2025 Lucid. All rights reserved.
