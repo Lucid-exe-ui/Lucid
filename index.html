@@ -22,11 +22,12 @@
     body {
       background: var(--bg);
       color: var(--primary);
-      min-height: 300vh; /* scrollable to trigger theme changes */
+      height: 300vh; /* scroll space */
       transition: all 1s ease;
       overflow-x: hidden;
     }
 
+    /* MATRIX BACKGROUND */
     .matrix {
       position: fixed;
       top: 0;
@@ -34,22 +35,18 @@
       width: 100%;
       height: 100%;
       background: #000;
-      overflow: hidden;
       z-index: 0;
     }
+    canvas { display: block; }
 
-    canvas {
-      display: block;
-    }
-
+    /* CONTENT FIXED IN CENTER */
     .container {
-      position: fixed; /* stays in place */
+      position: fixed; /* locked in place */
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
       text-align: center;
       z-index: 2;
@@ -61,7 +58,6 @@
       margin-bottom: 0.5rem;
       color: var(--primary);
       text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
-      animation: glitch 1.5s infinite;
       transition: color 1s, text-shadow 1s;
     }
 
@@ -84,19 +80,18 @@
       text-shadow: 0 0 5px var(--primary);
       transition: opacity 0.5s ease;
     }
-
     @keyframes pulse {
       0%, 100% { opacity: 0.2; transform: translateY(0); }
       50% { opacity: 1; transform: translateY(5px); }
     }
 
+    /* LINKS */
     .links {
       display: flex;
       flex-direction: column;
       gap: 1rem;
-      margin-bottom: 2rem;
+      margin: 2rem 0;
     }
-
     .links a, .dropdown-btn {
       padding: 0.75rem 1.5rem;
       background: rgba(0, 0, 0, 0.4);
@@ -107,17 +102,13 @@
       transition: all 0.4s ease;
       text-shadow: 0 0 5px var(--primary);
     }
-
     .links a:hover, .dropdown-btn:hover {
       background: rgba(255, 255, 255, 0.05);
       transform: scale(1.05);
       box-shadow: 0 0 10px var(--primary);
     }
 
-    .dropdown {
-      position: relative;
-    }
-
+    .dropdown { position: relative; }
     .dropdown-content {
       display: none;
       flex-direction: column;
@@ -133,14 +124,12 @@
       min-width: 160px;
       z-index: 10;
     }
-
     .dropdown-content a {
       padding: 0.75rem 1rem;
       text-align: center;
       display: block;
       color: var(--primary);
     }
-
     .dropdown-content a:hover {
       background: rgba(255, 255, 255, 0.05);
     }
@@ -150,7 +139,6 @@
       gap: 1rem;
       flex-wrap: wrap;
     }
-
     .music-controls button {
       padding: 0.75rem 1.25rem;
       background: transparent;
@@ -162,7 +150,6 @@
       transition: all 0.4s ease;
       text-shadow: 0 0 5px var(--primary);
     }
-
     .music-controls button:hover {
       background: rgba(255, 255, 255, 0.05);
       box-shadow: 0 0 10px var(--primary);
@@ -178,16 +165,6 @@
       z-index: 2;
       transition: color 1s;
     }
-
-    /* Glitch effect */
-    @keyframes glitch {
-      0% { text-shadow: 2px 2px #ff00ff, -2px -2px #00ffff; }
-      20% { text-shadow: -2px -2px #ff00ff, 2px 2px #00ffff; }
-      40% { text-shadow: 2px -2px #ff00ff, -2px 2px #00ffff; }
-      60% { text-shadow: -2px 2px #ff00ff, 2px -2px #00ffff; }
-      80% { text-shadow: 0 0 10px var(--primary); }
-      100% { text-shadow: 2px 2px #ff00ff, -2px -2px #00ffff; }
-    }
   </style>
 </head>
 <body>
@@ -201,15 +178,14 @@
     </header>
 
     <section class="links">
-      <a href="https://noveltyemails.com/fuckyou.com">YouTube</a>
-      <a href="https://discord.gg/xgBXgY4TU5">Contact</a>
-
+      <a href="#">YouTube</a>
+      <a href="#">Contact</a>
       <div class="dropdown">
         <div class="dropdown-btn">Socials ▾</div>
         <div class="dropdown-content">
-          <a href="https://steamcommunity.com/id/Kruhl/">Steam</a>
-          <a href="https://fakecrime.bio/lion">Fakecrime</a>
-          <a href="https://guns.lol/scrub">Guns.lol</a>
+          <a href="#">Steam</a>
+          <a href="#">Fakecrime</a>
+          <a href="#">Guns.lol</a>
         </div>
       </div>
     </section>
@@ -220,9 +196,7 @@
     </div>
   </div>
 
-  <footer>
-    &copy; 2025 Lucid. All rights reserved.
-  </footer>
+  <footer>&copy; 2025 Lucid. All rights reserved.</footer>
 
   <script>
     // Dropdown toggle
@@ -238,11 +212,10 @@
     // Force new tab
     document.querySelectorAll('a').forEach(link => link.setAttribute('target', '_blank'));
 
-    // Music
+    // Music (simplified placeholders)
     const music1 = new Audio('music.mp3');
     const music2 = new Audio('music2.mp3');
-    music1.loop = true;
-    music2.loop = true;
+    music1.loop = true; music2.loop = true;
     function stopAllMusic() { music1.pause(); music2.pause(); }
     document.getElementById('music1Btn').addEventListener('click', () => {
       if (music1.paused) { stopAllMusic(); music1.play(); } else { music1.pause(); }
@@ -276,11 +249,6 @@
     }
     setInterval(draw, 33);
 
-    window.addEventListener('resize', () => {
-      canvas.height = window.innerHeight;
-      canvas.width = window.innerWidth;
-    });
-
     // Scroll-based theme changer
     window.addEventListener('scroll', () => {
       const scroll = window.scrollY;
@@ -288,23 +256,19 @@
       const progress = scroll / maxScroll;
 
       if (progress < 0.33) {
-        document.documentElement.style.setProperty('--primary', '#00ff88'); // green hacker
+        document.documentElement.style.setProperty('--primary', '#00ff88'); // green
         document.documentElement.style.setProperty('--secondary', '#0aff9d');
       } else if (progress < 0.66) {
-        document.documentElement.style.setProperty('--primary', '#ff00ff'); // purple cyberpunk
+        document.documentElement.style.setProperty('--primary', '#ff00ff'); // purple
         document.documentElement.style.setProperty('--secondary', '#ff77ff');
       } else {
-        document.documentElement.style.setProperty('--primary', '#ff0033'); // red alert
+        document.documentElement.style.setProperty('--primary', '#ff0033'); // red
         document.documentElement.style.setProperty('--secondary', '#ff5555');
       }
 
       // Hide scroll hint after scrolling
       const scrollHint = document.getElementById('scrollHint');
-      if (scroll > 100) {
-        scrollHint.style.opacity = "0";
-      } else {
-        scrollHint.style.opacity = "1";
-      }
+      scrollHint.style.opacity = scroll > 100 ? "0" : "1";
     });
   </script>
 </body>
