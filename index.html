@@ -127,17 +127,17 @@
     </header>
 
     <section class="links">
-      <a href="https://rumble.com/user/JackeusVinsonius?e9s=src_v1_clr" target="_blank">#1 rumble streamer</a>
-      <a href="https://noveltyemails.com/fuckyou.com" target="_blank">Youtube</a>
-      <a href="https://discord.gg/xgBXgY4TU5" target="_blank">Contact</a>
+      <a href="https://rumble.com/user/JackeusVinsonius?e9s=src_v1_clr">#1 rumble streamer</a>
+      <a href="https://noveltyemails.com/fuckyou.com">Youtube</a>
+      <a href="https://discord.gg/xgBXgY4TU5">Contact</a>
 
       <!-- Dropdown -->
       <div class="dropdown">
         <div class="dropdown-btn">Socials &#x25BC;</div>
         <div class="dropdown-content">
-          <a href="https://steamcommunity.com/id/Kruhl/" target="_blank">Steam</a>
-          <a href="https://fakecrime.bio/lion" target="_blank">Fakecrime</a>
-          <a href="https://guns.lol/scrub" target="_blank">Guns.lol</a>
+          <a href="https://steamcommunity.com/id/Kruhl/">Steam</a>
+          <a href="https://fakecrime.bio/lion">Fakecrime</a>
+          <a href="https://guns.lol/scrub">Guns.lol</a>
         </div>
       </div>
     </section>
@@ -161,6 +161,12 @@
       if (!e.target.matches('.dropdown-btn')) {
         dropdownContent.style.display = 'none';
       }
+    });
+
+    // Automatically open all links in new tab
+    const allLinks = document.querySelectorAll('a');
+    allLinks.forEach(link => {
+      link.setAttribute('target', '_blank');
     });
   </script>
 </body>
