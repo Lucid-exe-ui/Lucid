@@ -122,8 +122,18 @@
     // matrix setup
     const canvas=document.getElementById('matrix'),ctx=canvas.getContext('2d');
     let fontSize=14,columns,rows,drops=[];
-    function resize(){canvas.width=innerWidth;canvas.height=innerHeight;columns=Math.floor(canvas.width/fontSize);rows=Math.floor(canvas.height/fontSize);drops=[];for(let i=0;i<columns;i++)drops[i]=Math.random()*rows;computeLayout();}
-    addEventListener('resize',resize);resize();
+
+    function resize(){
+      canvas.width=innerWidth;
+      canvas.height=innerHeight;
+      columns=Math.floor(canvas.width/fontSize);
+      rows=Math.floor(canvas.height/fontSize);
+      drops=[];
+      for(let i=0;i<columns;i++) drops[i]=Math.random()*rows;
+      computeLayout();
+    }
+    addEventListener('resize',resize);
+    resize();
 
     const letters='01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&*+-';
 
@@ -165,66 +175,56 @@
 ⢸⣦⣀⠀⠀⠀⠀⠈⣷⣿⣿⣿⣷⣦⢿⣿⣶⡿⠿⠟⠛⠋⠉⢳⣧⠀⠀⠀⡠⠖⠋⣿⡿⣿⣿⠈⢍⠻⣿⠇⠘⠀⠈⠉⠀⢠⣾⣿⡏⠀⣿⣿⡿⢿⣀⡀⠀⣀⣠⣤⣧⣤⡀⠀⠀⠀⠐⠟⠛⠉⠁⠀⠀⠀⠂⠘⠓⠚⢁⠔⠀⠀⠈⢁⣼⣿⠟⡿⣿⡏⢀⣾⣇⢸⣿⣿⡄⠀
 ⠈⢿⠿⢿⣦⣤⡀⠺⠛⠿⢿⣿⡿⠋⠀⣀⠘⠉⠀⠀⠀⠀⠀⣸⣿⠀⢀⠎⣠⣾⢰⣿⡽⣿⣿⠀⠤⠠⣤⡆⠀⠲⠶⢶⣶⣾⣿⣿⣥⣞⡁⢹⣷⣈⣿⣷⣿⣿⣿⣿⣿⣿⣿⣷⣶⡦⠀⢠⡶⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠐⢃⣸⣶⣿⣿⣯⡿⣱⣿⡇⢼⣿⣿⢸⣿⣿⡷⠀
 ⠐⠢⠀⠀⠉⠉⠛⣷⣦⣄⣸⣥⣀⣠⣦⣤⣤⣤⣤⣶⣦⣾⣿⡿⠃⢀⡌⢰⣿⡿⢸⣿⡇⣿⣿⣇⣀⣀⠈⠉⠀⣀⡀⠀⢠⣿⣿⡏⢨⢹⣷⢸⣿⣿⡌⠙⠿⠿⢿⣿⣏⣿⣿⣿⣧⠀⡆⢸⣿⣄⠀⠀⠀⠀⠈⢓⣀⣤⣴⣾⣿⣿⡿⣿⠟⠁⠀⢹⣿⣿⡌⣿⣿⢸⣿⣿⡇⡄`;
-    const skullLines=skull.split(/\\r?\\n/);
-    let skullCols=Math.max(...skullLines.map(l=>l.length));
-    let skullRows=skullLines.length;
-    let skullOffsetX=Math.floor((columns-skullCols)/2);
-    let skullOffsetY=Math.floor((rows-skullRows)/2);
-    let reveal=[];
 
-    function computeLayout(){
-      skullCols=Math.max(...skullLines.map(l=>l.length));
-      skullRows=skullLines.length;
-      skullOffsetX=Math.floor((columns-skullCols)/2);
-      skullOffsetY=Math.floor((rows-skullRows)/2);
-      reveal=[];
-      for(let y=0;y<skullRows;y++){reveal[y]=[];for(let x=0;x<skullCols;x++)reveal[y][x]=0;}
-    }
+    const skullLines = skull.split(/\r?\n/); // FIXED split
+    let skullRows = skullLines.length;
+    let skullCols = Math.max(...skullLines.map(l=>l.length));
+    let revealed = Array.from({length:skullRows},()=>Array(skullCols).fill(false));
 
-    function tryReveal(col,dropRow){
-      const sx=col-skullOffsetX,sy=Math.floor(dropRow)-skullOffsetY;
-      if(sy>=0&&sy<skullRows&&sx>=0&&sx<(skullLines[sy]||'').length){
-        if((skullLines[sy]||'')[sx]!==' '){reveal[sy][sx]=Math.min(1,reveal[sy][sx]+0.08);}
+    function computeLayout(){ /* recalc in case of resize */ skullCols = Math.max(...skullLines.map(l=>l.length)); skullRows = skullLines.length; revealed = Array.from({length:skullRows},()=>Array(skullCols).fill(false)); }
+
+    function tryReveal(){ // randomly reveal skull
+      for(let i=0;i<5;i++){
+        let r=Math.floor(Math.random()*skullRows);
+        let c=Math.floor(Math.random()*skullCols);
+        if(skullLines[r] && skullLines[r][c] && !revealed[r][c]) revealed[r][c]=true;
       }
     }
 
-    function draw(){
+    function drawMatrix(){
       ctx.fillStyle='rgba(0,0,0,0.05)';
       ctx.fillRect(0,0,canvas.width,canvas.height);
-      const primary=getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
-      ctx.fillStyle=primary;ctx.font=fontSize+'px monospace';ctx.textBaseline='top';
-
+      ctx.fillStyle='lime';
+      ctx.font=fontSize+'px Share Tech Mono';
       for(let i=0;i<columns;i++){
-        const text=letters[Math.floor(Math.random()*letters.length)];
-        const x=i*fontSize,y=Math.floor(drops[i])*fontSize;
-        ctx.fillText(text,x,y);
-        tryReveal(i,drops[i]);
-        if(drops[i]>rows+Math.random()*10){drops[i]=0;}
-        drops[i]+=0.4+Math.random()*0.8;
+        let text=letters.charAt(Math.floor(Math.random()*letters.length));
+        ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+        if(drops[i]*fontSize>canvas.height && Math.random()>0.975) drops[i]=0;
+        drops[i]++;
       }
+    }
 
-      for(let sy=0;sy<skullRows;sy++){
-        const line=skullLines[sy]||'';
-        for(let sx=0;sx<skullCols;sx++){
-          const ch=line[sx]||' ';
-          if(ch!==' '&&reveal[sy][sx]>0){
-            ctx.globalAlpha=reveal[sy][sx];
-            ctx.fillText(ch,(skullOffsetX+sx)*fontSize,(skullOffsetY+sy)*fontSize);
-            ctx.globalAlpha=1;
+    function drawSkull(){
+      ctx.fillStyle='rgba(0,255,136,0.9)';
+      ctx.font=fontSize+'px Share Tech Mono';
+      let startX = canvas.width/2 - (skullCols*fontSize)/2;
+      let startY = canvas.height/2 - (skullRows*fontSize)/2;
+      for(let r=0;r<skullRows;r++){
+        for(let c=0;c<skullCols;c++){
+          if(revealed[r][c]){
+            ctx.fillText(skullLines[r][c], startX + c*fontSize, startY + r*fontSize);
           }
         }
       }
     }
-    setInterval(draw,33);
 
-    // scroll theme
-    addEventListener('scroll',()=>{
-      const scroll=scrollY,max=document.body.scrollHeight-innerHeight,prog=scroll/max;
-      if(prog<.33){document.documentElement.style.setProperty('--primary','#00ff88');document.documentElement.style.setProperty('--secondary','#0aff9d');}
-      else if(prog<.66){document.documentElement.style.setProperty('--primary','#ff00ff');document.documentElement.style.setProperty('--secondary','#ff77ff');}
-      else{document.documentElement.style.setProperty('--primary','#ff0033');document.documentElement.style.setProperty('--secondary','#ff5555');}
-      document.getElementById('scrollHint').style.opacity=scroll>100?'0':'1';
-    });
+    function loop(){
+      drawMatrix();
+      tryReveal();
+      drawSkull();
+      requestAnimationFrame(loop);
+    }
+    loop();
   </script>
 </body>
 </html>
