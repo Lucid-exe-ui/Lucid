@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lucid</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Reset & basic styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: #0f0f0f;
+      color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+    .centered-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    header {
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #ccc;
+      margin-bottom: 2rem;
+    }
+
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+      position: relative;
+    }
+
+    .links a, .dropdown-btn {
+      display: inline-block;
+      padding: 0.75rem 2rem;
+      background: #1a1a1a;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.3s, transform 0.2s;
+      cursor: pointer;
+    }
+
+    .links a:hover, .dropdown-btn:hover {
+      background: #333;
+      transform: scale(1.05);
+    }
+
+    /* Dropdown menu */
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%; /* below the button */
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a1a;
+      border-radius: 8px;
+      flex-direction: column;
+      margin-top: 0.5rem;
+      min-width: 150px;
+      z-index: 10;
+    }
+
+    .dropdown-content a {
+      padding: 0.75rem 1rem;
+      text-align: center;
+      display: block;
+    }
+
+    .dropdown-content a:hover {
+      background: #333;
+      transform: none;
+    }
+
+    footer {
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      color: #777;
+    }
+
+    @media (min-width: 768px) {
+      .links {
+        flex-direction: row;
+      }
+      .dropdown-content {
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="centered-content">
+    <header>
+      <h1>Klazo</h1>
+      <p>I love it when I get called sugar by old black ladies</p>
+    </header>
+
+    <section class="links">
+      <a href="">Butthole pics</a>
+
+      <!-- Dropdown -->
+      <div class="dropdown">
+        <div class="dropdown-btn">Socials &#x25BC;</div>
+        <div class="dropdown-content">
+          <a href="https://steamcommunity.com/id/FentNeedIe/">Steam</a>
+          <a href="#">Example</a>
+          <a href="#">Example</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    &copy; 2025 Lucid. All rights reserved.
+  </footer>
+
+  <script>
+    // Toggle dropdown on click
+    const dropdownBtn = document.querySelector('.dropdown-btn');
+    const dropdownContent = document.querySelector('.dropdown-content');
+
+    dropdownBtn.addEventListener('click', () => {
+      dropdownContent.style.display = dropdownContent.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    // Close dropdown if click outside
+    window.addEventListener('click', (e) => {
+      if (!e.target.matches('.dropdown-btn')) {
+        dropdownContent.style.display = 'none';
+      }
+    });
+
+    // Automatically open all links in new tab
+    const allLinks = document.querySelectorAll('a');
+    allLinks.forEach(link => {
+      link.setAttribute('target', '_blank');
+    });
+  </script>
+</body>
+</html>
