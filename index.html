@@ -22,12 +22,11 @@
     body {
       background: var(--bg);
       color: var(--primary);
-      height: 300vh; /* scroll space */
+      height: 300vh;
       transition: all 1s ease;
       overflow-x: hidden;
     }
 
-    /* MATRIX BACKGROUND */
     .matrix {
       position: fixed;
       top: 0;
@@ -39,9 +38,8 @@
     }
     canvas { display: block; }
 
-    /* CONTENT FIXED IN CENTER */
     .container {
-      position: fixed; /* locked in place */
+      position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -69,7 +67,6 @@
       transition: color 1s;
     }
 
-    /* Scroll hint */
     .scroll-hint {
       margin-top: 1.5rem;
       font-size: 1rem;
@@ -85,14 +82,13 @@
       50% { opacity: 1; transform: translateY(5px); }
     }
 
-    /* LINKS */
     .links {
       display: flex;
       flex-direction: column;
       gap: 1rem;
       margin: 2rem 0;
     }
-    .links a, .dropdown-btn {
+    .links a, .dropdown-btn, .install-btn {
       padding: 0.75rem 1.5rem;
       background: rgba(0, 0, 0, 0.4);
       border: 1px solid var(--primary);
@@ -101,8 +97,9 @@
       text-decoration: none;
       transition: all 0.4s ease;
       text-shadow: 0 0 5px var(--primary);
+      cursor: pointer;
     }
-    .links a:hover, .dropdown-btn:hover {
+    .links a:hover, .dropdown-btn:hover, .install-btn:hover {
       background: rgba(255, 255, 255, 0.05);
       transform: scale(1.05);
       box-shadow: 0 0 10px var(--primary);
@@ -166,7 +163,6 @@
       transition: color 1s;
     }
 
-    /* Easter egg overlay */
     #easter-egg {
       display: none;
       position: fixed;
@@ -200,6 +196,10 @@
     <section class="links">
       <a href="https://noveltyemails.com/fuckyou.com">YouTube</a>
       <a href="https://discord.gg/xgBXgY4TU5">Contact</a>
+
+      <!-- 🔽 New Install Velu button -->
+      <button class="install-btn" id="installVeluBtn">Install Velu</button>
+
       <div class="dropdown">
         <div class="dropdown-btn">Socials ▾</div>
         <div class="dropdown-content">
@@ -218,7 +218,6 @@
 
   <footer>&copy; 2025 Lucid. All rights reserved.</footer>
 
-  <!-- Easter egg hidden image -->
   <div id="easter-egg">
     <img src="easteregg.png" alt="Easter Egg">
   </div>
@@ -237,7 +236,17 @@
     // Force new tab
     document.querySelectorAll('a').forEach(link => link.setAttribute('target', '_blank'));
 
-    // Music (simplified placeholders)
+    // Install Velu
+    document.getElementById('installVeluBtn').addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.href = 'velu.rar'; // File must exist in same directory
+      link.download = 'velu.rar';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    // Music
     const music1 = new Audio('music.mp3');
     const music2 = new Audio('music2.mp3');
     music1.loop = true; music2.loop = true;
@@ -281,49 +290,32 @@
       const progress = scroll / maxScroll;
 
       if (progress < 0.33) {
-        document.documentElement.style.setProperty('--primary', '#00ff88'); // green
+        document.documentElement.style.setProperty('--primary', '#00ff88');
         document.documentElement.style.setProperty('--secondary', '#0aff9d');
       } else if (progress < 0.66) {
-        document.documentElement.style.setProperty('--primary', '#ff00ff'); // purple
+        document.documentElement.style.setProperty('--primary', '#ff00ff');
         document.documentElement.style.setProperty('--secondary', '#ff77ff');
       } else {
-        document.documentElement.style.setProperty('--primary', '#ff0033'); // red
+        document.documentElement.style.setProperty('--primary', '#ff0033');
         document.documentElement.style.setProperty('--secondary', '#ff5555');
       }
 
-      // Hide scroll hint after scrolling
-      const scrollHint = document.getElementById('scrollHint');
-      scrollHint.style.opacity = scroll > 100 ? "0" : "1";
+      document.getElementById('scrollHint').style.opacity = scroll > 100 ? "0" : "1";
     });
 
-    // Easter egg logic
-    const secretWord = "femboy"; // <-- change this to your secret word
+    // Easter egg
+    const secretWord = "femboy";
     let typed = "";
-
     document.addEventListener("keydown", (e) => {
       typed += e.key.toLowerCase();
-
-      if (typed.length > secretWord.length) {
-        typed = typed.slice(-secretWord.length);
-      }
-
-      if (typed === secretWord) {
-        showEasterEgg();
-        typed = "";
-      }
+      if (typed.length > secretWord.length) typed = typed.slice(-secretWord.length);
+      if (typed === secretWord) { showEasterEgg(); typed = ""; }
     });
-
     function showEasterEgg() {
       const egg = document.getElementById("easter-egg");
       egg.style.display = "flex";
-
-      setTimeout(() => {
-        egg.style.display = "none";
-      }, 2000); // visible for 2 seconds
+      setTimeout(() => egg.style.display = "none", 2000);
     }
   </script>
 </body>
 </html>
-
-
-
