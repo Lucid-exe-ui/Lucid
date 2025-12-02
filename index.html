@@ -189,7 +189,7 @@
   <div class="container">
     <header>
       <h1>Lucid</h1>
-      <p>Special thanks to Burt, Install velu (free roblox external)</p>
+      <p>Special thanks to Burt</p>
       <div class="scroll-hint" id="scrollHint">▼ SCROLL ▼</div>
     </header>
 
@@ -237,13 +237,7 @@
     document.querySelectorAll('a').forEach(link => link.setAttribute('target', '_blank'));
 
     // Install Velu
-    document.getElementById('installVeluBtn').addEventListener('click', () => {
-      const link = document.createElement('a');
-      link.href = 'valu.rar'; // File must exist in same directory
-      link.download = 'velu.rar';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    
     });
 
     // Music
@@ -319,4 +313,5 @@
   </script>
 </body>
 </html>
+
 
