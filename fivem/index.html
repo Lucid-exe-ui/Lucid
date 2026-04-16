@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FiveM Visual Editor</title>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:Arial; }
+
+body {
+    background:#0a0a0a;
+    color:white;
+    overflow:hidden;
+}
+
+/* Background */
+canvas {
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:-1;
+}
+
+/* Sidebar */
+.sidebar {
+    position:fixed;
+    left:0;
+    top:0;
+    width:70px;
+    height:100%;
+    background:rgba(20,20,20,0.8);
+    backdrop-filter:blur(10px);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding-top:20px;
+}
+
+.icon {
+    width:40px;
+    height:40px;
+    margin:12px 0;
+    background:rgba(255,0,0,0.2);
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.icon:hover { background:red; transform:scale(1.1); }
+
+/* Main panel */
+.main {
+    margin-left:90px;
+    padding:30px;
+}
+
+.panel {
+    display:none;
+    background:rgba(30,30,30,0.6);
+    backdrop-filter:blur(15px);
+    padding:20px;
+    border-radius:15px;
+    width:400px;
+    box-shadow:0 0 20px rgba(255,0,0,0.2);
+}
+
+.active { display:block; }
+
+input, select, button {
+    width:100%;
+    margin:10px 0;
+    padding:10px;
+    border-radius:8px;
+    border:none;
+}
+
+button {
+    background:red;
+    color:white;
+    cursor:pointer;
+}
+
+.preview {
+    height:100px;
+    border-radius:10px;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="icon" onclick="show('weather')">🌤</div>
+    <div class="icon" onclick="show('lightning')">⚡</div>
+    <div class="icon" onclick="show('ped')">👤</div>
+    <div class="icon" onclick="show('water')">🌊</div>
+    <div class="icon" onclick="show('time')">🕒</div>
+    <div class="icon" onclick="show('clouds')">☁️</div>
+    <div class="icon" onclick="show('color')">🎨</div>
+    <div class="icon" onclick="show('sky')">🖼</div>
+</div>
+
+<div class="main">
+
+<!-- WEATHER -->
+<div id="weather" class="panel active">
+<h2>Weather Transitions</h2>
+<select>
+<option>CLEAR</option>
+<option>RAIN</option>
+<option>THUNDER</option>
+<option>FOG</option>
+</select>
+<input type="range" min="0" max="100">
+<p>Smooth transition speed</p>
+</div>
+
+<!-- LIGHTNING -->
+<div id="lightning" class="panel">
+<h2>Lightning Color</h2>
+<input type="color" id="lightColor" oninput="previewLightning()">
+<div class="preview" id="lightPreview"></div>
+</div>
+
+<!-- PED GLOW -->
+<div id="ped" class="panel">
+<h2>Ped Glow (UI Simulation)</h2>
+<input type="color" id="pedColor" oninput="pedGlow()">
+<input type="range" min="0" max="50" id="pedIntensity" oninput="pedGlow()">
+<div class="preview" id="pedPreview"></div>
+</div>
+
+<!-- WATER -->
+<div id="water" class="panel">
+<h2>Water Effects</h2>
+<input type="color" id="waterColor" oninput="waterPreview()">
+<input type="range" min="0" max="100" oninput="waterPreview()">
+<div class="preview" id="waterPreview"></div>
+</div>
+
+<!-- TIME -->
+<div id="time" class="panel">
+<h2>Day / Night Cycle</h2>
+<input type="range" min="0" max="24" id="timeSlider" oninput="timePreview()">
+<p id="timeText"></p>
+</div>
+
+<!-- CLOUDS -->
+<div id="clouds" class="panel">
+<h2>Custom Clouds</h2>
+<select>
+<option>Default</option>
+<option>Storm</option>
+<option>Clear Sky</option>
+<option>Heavy Fog</option>
+</select>
+</div>
+
+<!-- COLOR KEYFRAMES -->
+<div id="color" class="panel">
+<h2>Color Keyframes (Simulated)</h2>
+<input type="color">
+<input type="color">
+<p>Blend between colors</p>
+</div>
+
+<!-- SKYBOX -->
+<div id="sky" class="panel">
+<h2>PNG Skybox</h2>
+<input type="file" accept="image/png" onchange="skyPreview(event)">
+<div class="preview" id="skyPreview"></div>
+</div>
+
+</div>
+
+<script>
+// PANEL SWITCHING
+function show(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+// PREVIEWS
+function previewLightning() {
+    let c = document.getElementById("lightColor").value;
+    document.getElementById("lightPreview").style.background = c;
+}
+
+function pedGlow() {
+    let c = document.getElementById("pedColor").value;
+    let i = document.getElementById("pedIntensity").value;
+    let el = document.getElementById("pedPreview");
+    el.style.background = "#111";
+    el.style.boxShadow = `0 0 ${i}px ${c}`;
+}
+
+function waterPreview() {
+    let c = document.getElementById("waterColor").value;
+    document.getElementById("waterPreview").style.background = c;
+}
+
+function timePreview() {
+    let t = document.getElementById("timeSlider").value;
+    document.getElementById("timeText").innerText = t + ":00";
+    document.body.style.filter = `brightness(${t/24 + 0.3})`;
+}
+
+function skyPreview(e) {
+    let file = e.target.files[0];
+    let reader = new FileReader();
+    reader.onload = function() {
+        document.getElementById("skyPreview").style.background =
+            `url(${reader.result}) center/cover`;
+    };
+    reader.readAsDataURL(file);
+}
+
+// BACKGROUND ANIMATION
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let particles = [];
+for (let i=0;i<70;i++){
+    particles.push({
+        x:Math.random()*canvas.width,
+        y:Math.random()*canvas.height,
+        vx:Math.random()-0.5,
+        vy:Math.random()-0.5
+    });
+}
+
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+        p.x+=p.vx; p.y+=p.vy;
+        ctx.fillStyle="red";
+        ctx.fillRect(p.x,p.y,2,2);
+    });
+    requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+</body>
+</html>
