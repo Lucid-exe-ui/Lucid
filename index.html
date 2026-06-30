@@ -41,7 +41,6 @@ body{
 .nav{
     background:#3a3a3a;
     border:1px solid #444;
-    border-top:none;
     padding:10px;
 }
 
@@ -52,10 +51,6 @@ body{
     padding:8px 15px;
     cursor:pointer;
     margin-right:10px;
-}
-
-.nav button:hover{
-    background:#82c43c;
 }
 
 .box{
@@ -120,6 +115,11 @@ button{
     color:#ff6666;
     margin-top:10px;
 }
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+}
 </style>
 </head>
 
@@ -139,16 +139,17 @@ button{
 <!-- LOGIN -->
 <div id="login">
 <div class="box">
-<div class="boxTitle">Login</div>
+<div class="boxTitle">Login / Register</div>
 <div class="content">
 
-Username (Email)<br>
+Email<br>
 <input id="username"><br>
 
 Password<br>
 <input id="password" type="password"><br>
 
 <button onclick="login()">Login</button>
+<button onclick="register()">Register</button>
 
 <div class="error" id="error"></div>
 
@@ -161,11 +162,8 @@ Password<br>
 <div class="box">
 <div class="boxTitle">Welcome <span id="user"></span></div>
 
-<div class="content" id="posts">
+<div class="content" id="posts"></div>
 
-<!-- posts load here -->
-
-</div>
 </div>
 </div>
 
@@ -186,6 +184,7 @@ import {
 import {
   getAuth,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
@@ -216,6 +215,19 @@ window.login = async function () {
 
         loadPosts();
 
+    } catch (err) {
+        document.getElementById("error").innerText = err.message;
+    }
+};
+
+/* REGISTER */
+window.register = async function () {
+    const email = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        document.getElementById("error").innerText = "Account created! Now login.";
     } catch (err) {
         document.getElementById("error").innerText = err.message;
     }
