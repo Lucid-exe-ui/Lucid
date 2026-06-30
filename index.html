@@ -1,8 +1,117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <title>Lucid Archive Forum</title>
+
+<style>
+body {
+  margin: 0;
+  background: #0b0b0b;
+  color: #ddd;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  background: #111;
+  padding: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  border-bottom: 2px solid #39ff14;
+}
+
+.container {
+  width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+.title {
+  color: #39ff14;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.small {
+  font-size: 12px;
+  color: #aaa;
+}
+
+input, textarea {
+  width: 100%;
+  margin: 5px 0;
+  padding: 8px;
+  background: #0f0f0f;
+  border: 1px solid #333;
+  color: white;
+}
+
+button {
+  padding: 6px 10px;
+  background: #39ff14;
+  border: none;
+  cursor: pointer;
+  color: black;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #2bd10f;
+}
+
+.post-content {
+  margin-top: 5px;
+  white-space: pre-wrap;
+}
+
+a {
+  color: #4da3ff;
+}
+
+iframe {
+  width: 100%;
+  height: 315px;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>Lucid Archive Forum</header>
+
+<div class="container">
+
+<div id="authBox">
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <button onclick="register()">Register</button>
+</div>
+
+<div id="forum" style="display:none;">
+
+<h3 id="welcome"></h3>
+
+<div class="card">
+  <input id="title" placeholder="Thread title">
+  <textarea id="content" placeholder="Write post..."></textarea>
+  <button onclick="createThread()">Post Thread</button>
+</div>
+
+<div id="posts"></div>
+
+</div>
+
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -18,17 +127,19 @@ import {
   collection,
   addDoc,
   onSnapshot,
+  deleteDoc,
   doc,
   setDoc,
-  getDoc,
-  deleteDoc
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCK-Zi5f2v8DXNbJQ9_yfwv2V43SzqecYI",
+  apiKey: "YOUR_KEY",
   authDomain: "lucidarchiveforum.firebaseapp.com",
   projectId: "lucidarchiveforum",
-  appId: "1:614045519869:web:5e4646a29f5f18d98c1394"
+  storageBucket: "lucidarchiveforum.appspot.com",
+  messagingSenderId: "614045519869",
+  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -39,212 +150,140 @@ let currentUser = null;
 let isAdmin = false;
 let isBanned = false;
 
-/* ================= AUTH ================= */
-
-window.login = async function () {
-  const email = document.getElementById("username").value;
-  const pass = document.getElementById("password").value;
-
-  try {
-    await signInWithEmailAndPassword(auth, email, pass);
-  } catch (e) {
-    document.getElementById("error").innerText = e.message;
-  }
+/* AUTH */
+window.login = async () => {
+  await signInWithEmailAndPassword(auth,
+    email.value, password.value);
 };
 
-window.register = async function () {
-  const email = document.getElementById("username").value;
-  const pass = document.getElementById("password").value;
-
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-
-    await setDoc(doc(db, "users", cred.user.uid), {
-      email,
-      banned: false
-    });
-  } catch (e) {
-    document.getElementById("error").innerText = e.message;
-  }
+window.register = async () => {
+  await createUserWithEmailAndPassword(auth,
+    email.value, password.value);
 };
 
-window.logout = function () {
-  location.reload();
-};
-
-/* ================= USER STATE ================= */
-
+/* CHECK USER */
 onAuthStateChanged(auth, async (user) => {
   if (!user) return;
 
   currentUser = user;
-  isAdmin = user.email === "admin@lucid.me.uk";
 
-  const userDoc = await getDoc(doc(db, "users", user.uid));
-
-  if (userDoc.exists()) {
-    isBanned = userDoc.data().banned;
-  }
-
-  document.getElementById("login").style.display = "none";
+  document.getElementById("authBox").style.display = "none";
   document.getElementById("forum").style.display = "block";
-  document.getElementById("user").innerText = user.email;
 
-  if (isBanned) {
-    document.getElementById("banNotice").style.display = "block";
+  document.getElementById("welcome").innerText =
+    "Welcome " + user.email;
+
+  // user doc
+  const ref = doc(db, "users", user.email);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      banned: false,
+      role: user.email === "admin@lucid.me.uk" ? "admin" : "user"
+    });
   }
 
-  loadThreads();
+  const data = (await getDoc(ref)).data();
+
+  isAdmin = data.role === "admin";
+  isBanned = data.banned;
+
+  loadPosts();
 });
 
-/* ================= THREADS ================= */
-
-window.createThread = async function () {
+/* CREATE THREAD */
+window.createThread = async () => {
   if (isBanned) return alert("You are banned");
 
-  const title = document.getElementById("title").value;
-  const text = document.getElementById("text").value;
-
-  await addDoc(collection(db, "threads"), {
-    title,
-    text,
+  await addDoc(collection(db, "posts"), {
+    title: title.value,
+    content: content.value,
     user: currentUser.email,
     time: Date.now()
   });
+
+  title.value = "";
+  content.value = "";
 };
 
-function loadThreads() {
-  onSnapshot(collection(db, "threads"), (snap) => {
-    const box = document.getElementById("threads");
-    box.innerHTML = "";
+/* DELETE */
+window.deletePost = async (id) => {
+  await deleteDoc(doc(db, "posts", id));
+};
+
+/* BAN */
+window.banUser = async (email) => {
+  if (!isAdmin) return;
+
+  await setDoc(doc(db, "users", email), {
+    banned: true,
+    role: "user"
+  });
+  alert("User banned");
+};
+
+/* LOAD POSTS */
+function loadPosts() {
+  onSnapshot(collection(db, "posts"), (snap) => {
+    posts.innerHTML = "";
 
     snap.forEach(docu => {
       const d = docu.data();
 
-      const div = document.createElement("div");
-      div.className = "thread";
+      let html = formatContent(d.content);
 
-      div.innerHTML = `
-        <div class="threadTitle">${d.title}</div>
-        <div class="threadInfo">Posted by ${d.user}</div>
-        <div class="threadText">${render(d.text)}</div>
-        ${isAdmin ? `<button onclick="delThread('${docu.id}')">Delete</button>` : ""}
-        ${isAdmin ? `<button onclick="banUser('${d.user}')">Ban User</button>` : ""}
+      let post = document.createElement("div");
+      post.className = "card";
+
+      post.innerHTML = `
+        <div class="title">${d.title}</div>
+        <div class="small">Posted by ${d.user}</div>
+        <div class="post-content">${html}</div>
       `;
 
-      box.appendChild(div);
+      if (isAdmin) {
+        post.innerHTML += `
+          <button onclick="deletePost('${docu.id}')">Delete</button>
+          <button onclick="banUser('${d.user}')">Ban User</button>
+        `;
+      }
+
+      posts.appendChild(post);
     });
   });
 }
 
-window.delThread = async function (id) {
-  await deleteDoc(doc(db, "threads", id));
-};
+/* EMBEDS + MARKDOWN FIX */
+function formatContent(text) {
 
-window.banUser = async function (email) {
-  const usersSnap = await getDocs(collection(db, "users"));
-
-  usersSnap.forEach(async u => {
-    if (u.data().email === email) {
-      await setDoc(doc(db, "users", u.id), {
-        ...u.data(),
-        banned: true
-      });
-    }
-  });
-
-  alert("User banned");
-};
-
-/* ================= RENDER ENGINE ================= */
-
-function render(text) {
-  if (!text) return "";
-
-  let html = text;
-
-  /* escape */
-  html = html.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-  /* markdown */
-  html = html.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
-  html = html.replace(/\*(.*?)\*/g, "<i>$1</i>");
-
-  /* links */
-  html = html.replace(
+  // links
+  text = text.replace(
     /(https?:\/\/[^\s]+)/g,
-    `<a href="$1" target="_blank">$1</a>`
+    url => {
+      if (url.includes("youtube.com/watch")) {
+        const id = url.split("v=")[1];
+        return `<iframe src="https://www.youtube.com/embed/${id}" frameborder="0"></iframe>`;
+      }
+
+      if (url.includes("youtu.be")) {
+        const id = url.split("/").pop();
+        return `<iframe src="https://www.youtube.com/embed/${id}" frameborder="0"></iframe>`;
+      }
+
+      return `<a href="${url}" target="_blank">${url}</a>`;
+    }
   );
 
-  /* youtube */
-  html = html.replace(
-    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/g,
-    `<iframe width="320" height="180"
-      src="https://www.youtube.com/embed/$1"
-      frameborder="0" allowfullscreen></iframe>`
-  );
+  // bold
+  text = text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
 
-  /* images */
-  html = html.replace(
-    /(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/g,
-    `<img src="$1" style="max-width:300px;border-radius:6px;">`
-  );
+  // line breaks
+  text = text.replace(/\n/g, "<br>");
 
-  /* discord embeds */
-  html = html.replace(
-    /(https?:\/\/discord\.gg\/[^\s]+)/g,
-    `<div class="discord">Discord Invite: <a href="$1">$1</a></div>`
-  );
-
-  return html;
+  return text;
 }
 </script>
-
-<style>
-body{background:#111;color:#ddd;font-family:Arial}
-.wrapper{width:900px;margin:auto}
-.thread{background:#222;padding:10px;margin:10px 0;border:1px solid #444}
-.threadTitle{color:#8bc53f;font-size:18px}
-.threadText img{max-width:100%}
-.discord{background:#2b2f3a;padding:8px;margin-top:5px}
-button{margin-top:5px}
-#banNotice{display:none;background:red;padding:10px;margin:10px 0}
-</style>
-</head>
-
-<body>
-
-<div class="wrapper">
-
-<div id="login">
-<h2>Login</h2>
-<input id="username" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-
-<button onclick="login()">Login</button>
-<button onclick="register()">Register</button>
-
-<div id="error"></div>
-</div>
-
-<div id="forum" style="display:none">
-
-<h2>Welcome <span id="user"></span></h2>
-
-<div id="banNotice">
-🚫 You are banned. You can view posts but cannot create threads.
-</div>
-
-<input id="title" placeholder="Thread title"><br>
-<textarea id="text" placeholder="Write post..."></textarea><br>
-
-<button onclick="createThread()">Post Thread</button>
-
-<div id="threads"></div>
-
-</div>
-
-</div>
 
 </body>
 </html>
