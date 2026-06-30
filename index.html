@@ -6,7 +6,6 @@
 <title>Lucid Archive Forum</title>
 
 <style>
-
 *{
     margin:0;
     padding:0;
@@ -32,7 +31,6 @@ body{
 
 .logo{
     font-size:34px;
-    color:#d8d8d8;
     font-weight:bold;
 }
 
@@ -47,14 +45,17 @@ body{
     padding:10px;
 }
 
-.nav a{
-    color:#ddd;
-    text-decoration:none;
-    margin-right:20px;
+.nav button{
+    background:#6ca52d;
+    color:white;
+    border:none;
+    padding:8px 15px;
+    cursor:pointer;
+    margin-right:10px;
 }
 
-.nav a:hover{
-    color:#8bc53f;
+.nav button:hover{
+    background:#82c43c;
 }
 
 .box{
@@ -67,7 +68,6 @@ body{
     background:#303030;
     padding:10px;
     font-weight:bold;
-    border-bottom:1px solid #444;
 }
 
 .content{
@@ -91,15 +91,6 @@ button{
     cursor:pointer;
 }
 
-button:hover{
-    background:#82c43c;
-}
-
-.error{
-    color:#ff6666;
-    margin-top:10px;
-}
-
 .thread{
     background:#2a2a2a;
     border:1px solid #444;
@@ -115,39 +106,20 @@ button:hover{
 
 .threadInfo{
     color:#9b9b9b;
-    margin-top:5px;
     font-size:13px;
+    margin-top:5px;
 }
 
 .threadText{
-    margin-top:12px;
-    line-height:1.6;
+    margin-top:10px;
 }
 
-.category{
-    background:#2f2f2f;
-    padding:10px;
-    margin-top:20px;
-    border:1px solid #444;
-    font-weight:bold;
-}
+#forum{ display:none; }
 
-#forum{
-    display:none;
+.error{
+    color:#ff6666;
+    margin-top:10px;
 }
-
-.logout{
-    float:right;
-}
-
-.footer{
-    margin-top:15px;
-    padding:10px;
-    background:#2b2b2b;
-    border:1px solid #444;
-    color:#888;
-}
-
 </style>
 </head>
 
@@ -160,182 +132,140 @@ button:hover{
 </div>
 
 <div class="nav">
-<a href="#">Index</a>
-<a href="#">Members</a>
-<a href="#">Rules</a>
-
-<button class="logout" onclick="logout()">Logout</button>
+<button onclick="createPost()">New Thread</button>
+<button onclick="logout()">Logout</button>
 </div>
 
+<!-- LOGIN -->
 <div id="login">
-
 <div class="box">
-
-<div class="boxTitle">
-Login
-</div>
-
+<div class="boxTitle">Login</div>
 <div class="content">
 
-Username<br>
+Username (Email)<br>
 <input id="username"><br>
 
 Password<br>
 <input id="password" type="password"><br>
-
-<label>
-<input type="checkbox" style="width:auto;">
-Remember Me
-</label>
-
-<br><br>
 
 <button onclick="login()">Login</button>
 
 <div class="error" id="error"></div>
 
 </div>
-
+</div>
 </div>
 
-</div>
-
+<!-- FORUM -->
 <div id="forum">
-
 <div class="box">
+<div class="boxTitle">Welcome <span id="user"></span></div>
 
-<div class="boxTitle">
-Welcome <span id="user"></span>
+<div class="content" id="posts">
+
+<!-- posts load here -->
+
 </div>
-
-<div class="content">
-
-<div class="category">
-Announcements
 </div>
-
-<div class="thread">
-
-<div class="threadTitle">
-Welcome to Lucid Archive
-</div>
-
-<div class="threadInfo">
-Posted by Admin • Today
-</div>
-
-<div class="threadText">
-Welcome everyone! This is the first thread on the forum.
 </div>
 
 </div>
 
-<div class="thread">
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-<div class="threadTitle">
-Forum Rules
-</div>
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-<div class="threadInfo">
-Posted by Admin
-</div>
-
-<div class="threadText">
-• Respect everyone.<br>
-• No spam.<br>
-• Keep discussions friendly.
-</div>
-
-</div>
-
-<div class="category">
-General Discussion
-</div>
-
-<div class="thread">
-
-<div class="threadTitle">
-Introduce Yourself
-</div>
-
-<div class="threadInfo">
-Posted by Admin
-</div>
-
-<div class="threadText">
-Swear loyalty to lucid forum
-</div>
-
-</div>
-
-<div class="thread">
-
-<div class="threadTitle">
-Latest Projects
-</div>
-
-<div class="threadInfo">
-Posted by Admin
-</div>
-
-<div class="threadText">
-This forum is the king of all forums.
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="footer">
-Lucid Archive Forum © 2026
-</div>
-
-</div>
-
-<script>
-
-const users = {
-
-"Admin":"SuperPizza11",
-"jack":"Jackc",
-"jayden":"bcmovie"
-
+const firebaseConfig = {
+  apiKey: "AIzaSyCK-Zi5f2v8DXNbJQ9_yfwv2V43SzqecYI",
+  authDomain: "lucidarchiveforum.firebaseapp.com",
+  projectId: "lucidarchiveforum",
+  storageBucket: "lucidarchiveforum.appspot.com",
+  messagingSenderId: "614045519869",
+  appId: "1:614045519869:web:5e4646a29f5f18d98c1394"
 };
 
-function login(){
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-let u=document.getElementById("username").value;
-let p=document.getElementById("password").value;
+/* LOGIN */
+window.login = async function () {
+    const email = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
 
-if(users[u]===p){
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
 
-document.getElementById("login").style.display="none";
-document.getElementById("forum").style.display="block";
-document.getElementById("user").innerHTML=u;
+        document.getElementById("login").style.display = "none";
+        document.getElementById("forum").style.display = "block";
+        document.getElementById("user").innerText = email;
 
-}else{
+        loadPosts();
 
-document.getElementById("error").innerHTML="Invalid username or password.";
+    } catch (err) {
+        document.getElementById("error").innerText = err.message;
+    }
+};
 
+/* LOGOUT */
+window.logout = async function () {
+    await signOut(auth);
+
+    document.getElementById("forum").style.display = "none";
+    document.getElementById("login").style.display = "block";
+};
+
+/* CREATE THREAD */
+window.createPost = async function () {
+    const title = prompt("Thread title:");
+    const text = prompt("Thread content:");
+
+    if (!title || !text) return;
+
+    await addDoc(collection(db, "posts"), {
+        user: auth.currentUser.email,
+        title,
+        text,
+        time: Date.now()
+    });
+};
+
+/* LOAD POSTS */
+function loadPosts() {
+    const postsDiv = document.getElementById("posts");
+
+    const q = query(collection(db, "posts"), orderBy("time", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+        postsDiv.innerHTML = "";
+
+        snapshot.forEach((doc) => {
+            const p = doc.data();
+
+            postsDiv.innerHTML += `
+                <div class="thread">
+                    <div class="threadTitle">${p.title}</div>
+                    <div class="threadInfo">Posted by ${p.user}</div>
+                    <div class="threadText">${p.text}</div>
+                </div>
+            `;
+        });
+    });
 }
-
-}
-
-function logout(){
-
-document.getElementById("forum").style.display="none";
-document.getElementById("login").style.display="block";
-
-document.getElementById("username").value="";
-document.getElementById("password").value="";
-document.getElementById("error").innerHTML="";
-
-}
-
 </script>
 
 </body>
