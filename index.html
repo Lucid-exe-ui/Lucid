@@ -34,14 +34,14 @@ body{
     font-weight:bold;
 }
 
-.logo span{
-    color:#8bc53f;
-}
+.logo span{ color:#8bc53f; }
 
 .nav{
     background:#3a3a3a;
     border:1px solid #444;
     padding:10px;
+    display:flex;
+    gap:10px;
 }
 
 .nav button{
@@ -50,7 +50,6 @@ body{
     border:none;
     padding:8px 15px;
     cursor:pointer;
-    margin-right:10px;
 }
 
 .box{
@@ -69,20 +68,20 @@ body{
     padding:20px;
 }
 
-input{
-    width:260px;
+input, textarea{
+    width:100%;
     padding:8px;
+    margin-bottom:10px;
     background:#181818;
     border:1px solid #555;
     color:white;
-    margin-bottom:10px;
 }
 
 button{
     background:#6ca52d;
     color:white;
     border:none;
-    padding:10px 25px;
+    padding:10px 20px;
     cursor:pointer;
 }
 
@@ -100,25 +99,23 @@ button{
 }
 
 .threadInfo{
-    color:#9b9b9b;
-    font-size:13px;
+    color:#999;
+    font-size:12px;
     margin-top:5px;
 }
 
 .threadText{
     margin-top:10px;
+    white-space:pre-wrap;
 }
 
 #forum{ display:none; }
 
-.error{
-    color:#ff6666;
-    margin-top:10px;
-}
+.error{ color:#ff6666; margin-top:10px; }
 
-.topbar{
-    display:flex;
-    justify-content:space-between;
+#createBox{
+    display:none;
+    margin-top:15px;
 }
 </style>
 </head>
@@ -132,7 +129,7 @@ button{
 </div>
 
 <div class="nav">
-<button onclick="createPost()">New Thread</button>
+<button onclick="showCreate()">New Thread</button>
 <button onclick="logout()">Logout</button>
 </div>
 
@@ -143,7 +140,7 @@ button{
 <div class="content">
 
 Email<br>
-<input id="username"><br>
+<input id="email"><br>
 
 Password<br>
 <input id="password" type="password"><br>
@@ -159,12 +156,25 @@ Password<br>
 
 <!-- FORUM -->
 <div id="forum">
+
 <div class="box">
 <div class="boxTitle">Welcome <span id="user"></span></div>
+<div class="content">
 
-<div class="content" id="posts"></div>
+<!-- CREATE THREAD -->
+<div id="createBox">
+<h3>Create Thread</h3>
+<input id="title" placeholder="Thread title">
+<textarea id="content" placeholder="Write your thread..."></textarea>
+<button onclick="createThread()">Post Thread</button>
+</div>
+
+<!-- THREADS -->
+<div id="threads"></div>
 
 </div>
+</div>
+
 </div>
 
 </div>
@@ -185,7 +195,8 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut
+  signOut,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
@@ -201,78 +212,91 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-/* LOGIN */
-window.login = async function () {
-    const email = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-
-    try {
-        await signInWithEmailAndPassword(auth, email, password);
-
+/* AUTH STATE (fixes refresh logout bug) */
+onAuthStateChanged(auth, (user) => {
+    if (user) {
         document.getElementById("login").style.display = "none";
         document.getElementById("forum").style.display = "block";
-        document.getElementById("user").innerText = email;
+        document.getElementById("user").innerText = user.email;
 
-        loadPosts();
+        loadThreads();
+    } else {
+        document.getElementById("login").style.display = "block";
+        document.getElementById("forum").style.display = "none";
+    }
+});
 
-    } catch (err) {
-        document.getElementById("error").innerText = err.message;
+/* LOGIN */
+window.login = async function () {
+    try {
+        await signInWithEmailAndPassword(
+            auth,
+            document.getElementById("email").value,
+            document.getElementById("password").value
+        );
+    } catch (e) {
+        document.getElementById("error").innerText = e.message;
     }
 };
 
 /* REGISTER */
 window.register = async function () {
-    const email = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-
     try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        document.getElementById("error").innerText = "Account created! Now login.";
-    } catch (err) {
-        document.getElementById("error").innerText = err.message;
+        await createUserWithEmailAndPassword(
+            auth,
+            document.getElementById("email").value,
+            document.getElementById("password").value
+        );
+    } catch (e) {
+        document.getElementById("error").innerText = e.message;
     }
 };
 
 /* LOGOUT */
 window.logout = async function () {
     await signOut(auth);
+};
 
-    document.getElementById("forum").style.display = "none";
-    document.getElementById("login").style.display = "block";
+/* SHOW CREATE BOX */
+window.showCreate = function () {
+    document.getElementById("createBox").style.display = "block";
 };
 
 /* CREATE THREAD */
-window.createPost = async function () {
-    const title = prompt("Thread title:");
-    const text = prompt("Thread content:");
+window.createThread = async function () {
+    const title = document.getElementById("title").value;
+    const content = document.getElementById("content").value;
 
-    if (!title || !text) return;
+    if (!title || !content) return;
 
-    await addDoc(collection(db, "posts"), {
+    await addDoc(collection(db, "threads"), {
         user: auth.currentUser.email,
         title,
-        text,
+        content,
         time: Date.now()
     });
+
+    document.getElementById("title").value = "";
+    document.getElementById("content").value = "";
+    document.getElementById("createBox").style.display = "none";
 };
 
-/* LOAD POSTS */
-function loadPosts() {
-    const postsDiv = document.getElementById("posts");
-
-    const q = query(collection(db, "posts"), orderBy("time", "desc"));
+/* LOAD THREADS */
+function loadThreads() {
+    const q = query(collection(db, "threads"), orderBy("time", "desc"));
 
     onSnapshot(q, (snapshot) => {
-        postsDiv.innerHTML = "";
+        const container = document.getElementById("threads");
+        container.innerHTML = "";
 
-        snapshot.forEach((doc) => {
-            const p = doc.data();
+        snapshot.forEach(doc => {
+            const t = doc.data();
 
-            postsDiv.innerHTML += `
+            container.innerHTML += `
                 <div class="thread">
-                    <div class="threadTitle">${p.title}</div>
-                    <div class="threadInfo">Posted by ${p.user}</div>
-                    <div class="threadText">${p.text}</div>
+                    <div class="threadTitle">${t.title}</div>
+                    <div class="threadInfo">Posted by ${t.user}</div>
+                    <div class="threadText">${t.content}</div>
                 </div>
             `;
         });
