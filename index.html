@@ -1,273 +1,250 @@
-    font-weight:bold;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lucid Archive Forum</title>
 
-.logo span{
-    color:#8bc53f;
-}
-.logo span{ color:#8bc53f; }
-
-.nav{
-    background:#3a3a3a;
-    border:1px solid #444;
-    padding:10px;
-    display:flex;
-    gap:10px;
-}
-
-.nav button{
-@@ -50,7 +50,6 @@
-    border:none;
-    padding:8px 15px;
-    cursor:pointer;
-    margin-right:10px;
-}
-
-.box{
-@@ -69,20 +68,20 @@
-    padding:20px;
-}
-
-input{
-    width:260px;
-input, textarea{
-    width:100%;
-    padding:8px;
-    margin-bottom:10px;
-    background:#181818;
-    border:1px solid #555;
-    color:white;
-    margin-bottom:10px;
-}
-
-button{
-    background:#6ca52d;
-    color:white;
-    border:none;
-    padding:10px 25px;
-    padding:10px 20px;
-    cursor:pointer;
-}
-
-@@ -100,25 +99,23 @@
-}
-
-.threadInfo{
-    color:#9b9b9b;
-    font-size:13px;
-    color:#999;
-    font-size:12px;
-    margin-top:5px;
-}
-
-.threadText{
-    margin-top:10px;
-    white-space:pre-wrap;
-}
-
-#forum{ display:none; }
-
-.error{
-    color:#ff6666;
-    margin-top:10px;
-}
-.error{ color:#ff6666; margin-top:10px; }
-
-.topbar{
-    display:flex;
-    justify-content:space-between;
-#createBox{
-    display:none;
-    margin-top:15px;
-}
-</style>
-</head>
-@@ -132,7 +129,7 @@
-</div>
-
-<div class="nav">
-<button onclick="createPost()">New Thread</button>
-<button onclick="showCreate()">New Thread</button>
-<button onclick="logout()">Logout</button>
-</div>
-
-@@ -143,7 +140,7 @@
-<div class="content">
-
-Email<br>
-<input id="username"><br>
-<input id="email"><br>
-
-Password<br>
-<input id="password" type="password"><br>
-@@ -159,16 +156,29 @@
-
-<!-- FORUM -->
-<div id="forum">
-
-<div class="box">
-<div class="boxTitle">Welcome <span id="user"></span></div>
-<div class="content">
-
-<div class="content" id="posts"></div>
-<!-- CREATE THREAD -->
-<div id="createBox">
-<h3>Create Thread</h3>
-<input id="title" placeholder="Thread title">
-<textarea id="content" placeholder="Write your thread..."></textarea>
-<button onclick="createThread()">Post Thread</button>
-</div>
-
-<!-- THREADS -->
-<div id="threads"></div>
-
-</div>
-</div>
-
-</div>
-
-</div>
-
-<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-@@ -185,7 +195,8 @@
+import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut
-  signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  doc,
+  setDoc,
+  getDoc,
+  deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
 const firebaseConfig = {
-@@ -201,78 +212,91 @@
-const db = getFirestore(app);
+  apiKey: "AIzaSyCK-Zi5f2v8DXNbJQ9_yfwv2V43SzqecYI",
+  authDomain: "lucidarchiveforum.firebaseapp.com",
+  projectId: "lucidarchiveforum",
+  appId: "1:614045519869:web:5e4646a29f5f18d98c1394"
+};
+
+const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-/* LOGIN */
+let currentUser = null;
+let isAdmin = false;
+let isBanned = false;
+
+/* ================= AUTH ================= */
+
 window.login = async function () {
-    const email = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+  const email = document.getElementById("username").value;
+  const pass = document.getElementById("password").value;
 
-    try {
-        await signInWithEmailAndPassword(auth, email, password);
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch (e) {
+    document.getElementById("error").innerText = e.message;
+  }
+};
 
-/* AUTH STATE (fixes refresh logout bug) */
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("forum").style.display = "block";
-        document.getElementById("user").innerText = email;
-        document.getElementById("user").innerText = user.email;
+window.register = async function () {
+  const email = document.getElementById("username").value;
+  const pass = document.getElementById("password").value;
 
-        loadPosts();
-        loadThreads();
-    } else {
-        document.getElementById("login").style.display = "block";
-        document.getElementById("forum").style.display = "none";
-    }
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+
+    await setDoc(doc(db, "users", cred.user.uid), {
+      email,
+      banned: false
+    });
+  } catch (e) {
+    document.getElementById("error").innerText = e.message;
+  }
+};
+
+window.logout = function () {
+  location.reload();
+};
+
+/* ================= USER STATE ================= */
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return;
+
+  currentUser = user;
+  isAdmin = user.email === "admin@lucid.me.uk";
+
+  const userDoc = await getDoc(doc(db, "users", user.uid));
+
+  if (userDoc.exists()) {
+    isBanned = userDoc.data().banned;
+  }
+
+  document.getElementById("login").style.display = "none";
+  document.getElementById("forum").style.display = "block";
+  document.getElementById("user").innerText = user.email;
+
+  if (isBanned) {
+    document.getElementById("banNotice").style.display = "block";
+  }
+
+  loadThreads();
 });
 
-    } catch (err) {
-        document.getElementById("error").innerText = err.message;
-/* LOGIN */
-window.login = async function () {
-    try {
-        await signInWithEmailAndPassword(
-            auth,
-            document.getElementById("email").value,
-            document.getElementById("password").value
-        );
-    } catch (e) {
-        document.getElementById("error").innerText = e.message;
-    }
-};
+/* ================= THREADS ================= */
 
-/* REGISTER */
-window.register = async function () {
-    const email = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-
-    try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        document.getElementById("error").innerText = "Account created! Now login.";
-    } catch (err) {
-        document.getElementById("error").innerText = err.message;
-        await createUserWithEmailAndPassword(
-            auth,
-            document.getElementById("email").value,
-            document.getElementById("password").value
-        );
-    } catch (e) {
-        document.getElementById("error").innerText = e.message;
-    }
-};
-
-/* LOGOUT */
-window.logout = async function () {
-    await signOut(auth);
-};
-
-    document.getElementById("forum").style.display = "none";
-    document.getElementById("login").style.display = "block";
-/* SHOW CREATE BOX */
-window.showCreate = function () {
-    document.getElementById("createBox").style.display = "block";
-};
-
-/* CREATE THREAD */
-window.createPost = async function () {
-    const title = prompt("Thread title:");
-    const text = prompt("Thread content:");
 window.createThread = async function () {
-    const title = document.getElementById("title").value;
-    const content = document.getElementById("content").value;
+  if (isBanned) return alert("You are banned");
 
-    if (!title || !text) return;
-    if (!title || !content) return;
+  const title = document.getElementById("title").value;
+  const text = document.getElementById("text").value;
 
-    await addDoc(collection(db, "posts"), {
-    await addDoc(collection(db, "threads"), {
-        user: auth.currentUser.email,
-        title,
-        text,
-        content,
-        time: Date.now()
-    });
+  await addDoc(collection(db, "threads"), {
+    title,
+    text,
+    user: currentUser.email,
+    time: Date.now()
+  });
 };
 
-/* LOAD POSTS */
-function loadPosts() {
-    const postsDiv = document.getElementById("posts");
-    document.getElementById("title").value = "";
-    document.getElementById("content").value = "";
-    document.getElementById("createBox").style.display = "none";
-};
-
-    const q = query(collection(db, "posts"), orderBy("time", "desc"));
-/* LOAD THREADS */
 function loadThreads() {
-    const q = query(collection(db, "threads"), orderBy("time", "desc"));
+  onSnapshot(collection(db, "threads"), (snap) => {
+    const box = document.getElementById("threads");
+    box.innerHTML = "";
 
-    onSnapshot(q, (snapshot) => {
-        postsDiv.innerHTML = "";
-        const container = document.getElementById("threads");
-        container.innerHTML = "";
+    snap.forEach(docu => {
+      const d = docu.data();
 
-        snapshot.forEach((doc) => {
-            const p = doc.data();
-        snapshot.forEach(doc => {
-            const t = doc.data();
+      const div = document.createElement("div");
+      div.className = "thread";
 
-            postsDiv.innerHTML += `
-            container.innerHTML += `
-                <div class="thread">
-                    <div class="threadTitle">${p.title}</div>
-                    <div class="threadInfo">Posted by ${p.user}</div>
-                    <div class="threadText">${p.text}</div>
-                    <div class="threadTitle">${t.title}</div>
-                    <div class="threadInfo">Posted by ${t.user}</div>
-                    <div class="threadText">${t.content}</div>
-                </div>
-            `;
-        });
+      div.innerHTML = `
+        <div class="threadTitle">${d.title}</div>
+        <div class="threadInfo">Posted by ${d.user}</div>
+        <div class="threadText">${render(d.text)}</div>
+        ${isAdmin ? `<button onclick="delThread('${docu.id}')">Delete</button>` : ""}
+        ${isAdmin ? `<button onclick="banUser('${d.user}')">Ban User</button>` : ""}
+      `;
+
+      box.appendChild(div);
+    });
+  });
+}
+
+window.delThread = async function (id) {
+  await deleteDoc(doc(db, "threads", id));
+};
+
+window.banUser = async function (email) {
+  const usersSnap = await getDocs(collection(db, "users"));
+
+  usersSnap.forEach(async u => {
+    if (u.data().email === email) {
+      await setDoc(doc(db, "users", u.id), {
+        ...u.data(),
+        banned: true
+      });
+    }
+  });
+
+  alert("User banned");
+};
+
+/* ================= RENDER ENGINE ================= */
+
+function render(text) {
+  if (!text) return "";
+
+  let html = text;
+
+  /* escape */
+  html = html.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  /* markdown */
+  html = html.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+  html = html.replace(/\*(.*?)\*/g, "<i>$1</i>");
+
+  /* links */
+  html = html.replace(
+    /(https?:\/\/[^\s]+)/g,
+    `<a href="$1" target="_blank">$1</a>`
+  );
+
+  /* youtube */
+  html = html.replace(
+    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/g,
+    `<iframe width="320" height="180"
+      src="https://www.youtube.com/embed/$1"
+      frameborder="0" allowfullscreen></iframe>`
+  );
+
+  /* images */
+  html = html.replace(
+    /(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/g,
+    `<img src="$1" style="max-width:300px;border-radius:6px;">`
+  );
+
+  /* discord embeds */
+  html = html.replace(
+    /(https?:\/\/discord\.gg\/[^\s]+)/g,
+    `<div class="discord">Discord Invite: <a href="$1">$1</a></div>`
+  );
+
+  return html;
+}
+</script>
+
+<style>
+body{background:#111;color:#ddd;font-family:Arial}
+.wrapper{width:900px;margin:auto}
+.thread{background:#222;padding:10px;margin:10px 0;border:1px solid #444}
+.threadTitle{color:#8bc53f;font-size:18px}
+.threadText img{max-width:100%}
+.discord{background:#2b2f3a;padding:8px;margin-top:5px}
+button{margin-top:5px}
+#banNotice{display:none;background:red;padding:10px;margin:10px 0}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<div id="login">
+<h2>Login</h2>
+<input id="username" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+<button onclick="register()">Register</button>
+
+<div id="error"></div>
+</div>
+
+<div id="forum" style="display:none">
+
+<h2>Welcome <span id="user"></span></h2>
+
+<div id="banNotice">
+🚫 You are banned. You can view posts but cannot create threads.
+</div>
+
+<input id="title" placeholder="Thread title"><br>
+<textarea id="text" placeholder="Write post..."></textarea><br>
+
+<button onclick="createThread()">Post Thread</button>
+
+<div id="threads"></div>
+
+</div>
+
+</div>
+
+</body>
+</html>
