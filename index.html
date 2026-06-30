@@ -3,120 +3,149 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lucid</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<title>Lucid Archive Forum</title>
 
 <style>
 
-:root{
---primary:#00ff88;
---secondary:#0aff9d;
---bg:#000;
-}
-
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Share Tech Mono', monospace;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Tahoma,Arial,sans-serif;
 }
 
 body{
-background:#000;
-color:var(--primary);
-height:300vh;
-overflow-x:hidden;
-transition:1s;
+    background:#111;
+    color:#d7d7d7;
 }
 
-/* MATRIX BACKGROUND */
-
-.matrix{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-z-index:0;
+.wrapper{
+    width:1000px;
+    margin:20px auto;
 }
 
-canvas{
-display:block;
+.header{
+    background:#2b2b2b;
+    border:1px solid #444;
+    padding:18px;
 }
 
-/* MAIN BIO */
-
-.container{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-z-index:2;
-text-align:center;
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:20px;
+.logo{
+    font-size:34px;
+    color:#d8d8d8;
+    font-weight:bold;
 }
 
-h1{
-font-size:3rem;
-text-shadow:0 0 10px var(--primary),0 0 25px var(--primary);
-letter-spacing:3px;
+.logo span{
+    color:#8bc53f;
 }
 
-.bio{
-opacity:.8;
-max-width:500px;
-font-size:.9rem;
-line-height:1.6;
+.nav{
+    background:#3a3a3a;
+    border:1px solid #444;
+    border-top:none;
+    padding:10px;
 }
 
-.scroll-hint{
-margin-top:10px;
-opacity:.6;
-animation:pulse 1.5s infinite;
+.nav a{
+    color:#ddd;
+    text-decoration:none;
+    margin-right:20px;
 }
 
-@keyframes pulse{
-0%,100%{opacity:.2; transform:translateY(0)}
-50%{opacity:1; transform:translateY(6px)}
+.nav a:hover{
+    color:#8bc53f;
 }
 
-/* LINKS */
-
-.links{
-display:flex;
-flex-direction:column;
-gap:12px;
-margin-top:20px;
+.box{
+    background:#232323;
+    border:1px solid #444;
+    margin-top:15px;
 }
 
-.links a{
-padding:10px 20px;
-border:1px solid var(--primary);
-text-decoration:none;
-color:var(--primary);
-transition:.3s;
-background:rgba(0,0,0,.4);
+.boxTitle{
+    background:#303030;
+    padding:10px;
+    font-weight:bold;
+    border-bottom:1px solid #444;
 }
 
-.links a:hover{
-box-shadow:0 0 12px var(--primary);
-transform:scale(1.05);
+.content{
+    padding:20px;
 }
 
-/* FOOTER */
+input{
+    width:260px;
+    padding:8px;
+    background:#181818;
+    border:1px solid #555;
+    color:white;
+    margin-bottom:10px;
+}
 
-footer{
-position:fixed;
-bottom:10px;
-width:100%;
-text-align:center;
-font-size:.8rem;
-opacity:.6;
-z-index:2;
+button{
+    background:#6ca52d;
+    color:white;
+    border:none;
+    padding:10px 25px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#82c43c;
+}
+
+.error{
+    color:#ff6666;
+    margin-top:10px;
+}
+
+.thread{
+    background:#2a2a2a;
+    border:1px solid #444;
+    padding:15px;
+    margin-top:10px;
+}
+
+.threadTitle{
+    color:#8bc53f;
+    font-size:18px;
+    font-weight:bold;
+}
+
+.threadInfo{
+    color:#9b9b9b;
+    margin-top:5px;
+    font-size:13px;
+}
+
+.threadText{
+    margin-top:12px;
+    line-height:1.6;
+}
+
+.category{
+    background:#2f2f2f;
+    padding:10px;
+    margin-top:20px;
+    border:1px solid #444;
+    font-weight:bold;
+}
+
+#forum{
+    display:none;
+}
+
+.logout{
+    float:right;
+}
+
+.footer{
+    margin-top:15px;
+    padding:10px;
+    background:#2b2b2b;
+    border:1px solid #444;
+    color:#888;
 }
 
 </style>
@@ -124,114 +153,188 @@ z-index:2;
 
 <body>
 
-<div class="matrix">
-<canvas id="matrix"></canvas>
+<div class="wrapper">
+
+<div class="header">
+<div class="logo">lucid<span>archive</span> forum</div>
 </div>
 
-<div class="container">
+<div class="nav">
+<a href="#">Index</a>
+<a href="#">Members</a>
+<a href="#">Rules</a>
 
-<h1>Lucid</h1>
-
-<p class="bio">
-> digital presence <br>
-> systems enthusiast <br>
-> exploring networks & code
-</p>
-
-<div class="scroll-hint" id="scrollHint">
-▼ SCROLL ▼
+<button class="logout" onclick="logout()">Logout</button>
 </div>
 
-<div class="links">
+<div id="login">
 
-<a href="https://www.youtube.com/@Cruelhvh" target="_blank">YouTube</a>
-<a href="https://discord.gg/bC9yejgM59" target="_blank">Contact</a>
-<a href="https://steamcommunity.com/id/" target="_blank">Steam</a>
-<a href="https://fakecrime.bio/lion" target="_blank">Fakecrime</a>
-<a href="https://guns.lol/scrub" target="_blank">Guns.lol</a>
+<div class="box">
+
+<div class="boxTitle">
+Login
+</div>
+
+<div class="content">
+
+Username<br>
+<input id="username"><br>
+
+Password<br>
+<input id="password" type="password"><br>
+
+<label>
+<input type="checkbox" style="width:auto;">
+Remember Me
+</label>
+
+<br><br>
+
+<button onclick="login()">Login</button>
+
+<div class="error" id="error"></div>
 
 </div>
 
 </div>
 
-<footer>
-© 2025 Lucid
-</footer>
+</div>
+
+<div id="forum">
+
+<div class="box">
+
+<div class="boxTitle">
+Welcome <span id="user"></span>
+</div>
+
+<div class="content">
+
+<div class="category">
+Announcements
+</div>
+
+<div class="thread">
+
+<div class="threadTitle">
+Welcome to Lucid Archive
+</div>
+
+<div class="threadInfo">
+Posted by Admin • Today
+</div>
+
+<div class="threadText">
+Welcome everyone! This is the first thread on the forum.
+</div>
+
+</div>
+
+<div class="thread">
+
+<div class="threadTitle">
+Forum Rules
+</div>
+
+<div class="threadInfo">
+Posted by Admin
+</div>
+
+<div class="threadText">
+• Respect everyone.<br>
+• No spam.<br>
+• Keep discussions friendly.
+</div>
+
+</div>
+
+<div class="category">
+General Discussion
+</div>
+
+<div class="thread">
+
+<div class="threadTitle">
+Introduce Yourself
+</div>
+
+<div class="threadInfo">
+Posted by jack
+</div>
+
+<div class="threadText">
+Hello everyone! Glad to be here.
+</div>
+
+</div>
+
+<div class="thread">
+
+<div class="threadTitle">
+Latest Projects
+</div>
+
+<div class="threadInfo">
+Posted by jayden
+</div>
+
+<div class="threadText">
+Share what you've been working on recently.
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="footer">
+Lucid Archive Forum © 2026
+</div>
+
+</div>
 
 <script>
 
-/* MATRIX EFFECT */
+const users = {
 
-const canvas=document.getElementById("matrix");
-const ctx=canvas.getContext("2d");
+"Admin":"SuperPizza11",
+"jack":"Jackc",
+"jayden":"bcmovie"
 
-canvas.height=window.innerHeight;
-canvas.width=window.innerWidth;
+};
 
-const letters="01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&*";
-const fontSize=14;
-const columns=canvas.width/fontSize;
-const drops=[];
+function login(){
 
-for(let x=0;x<columns;x++) drops[x]=1;
+let u=document.getElementById("username").value;
+let p=document.getElementById("password").value;
 
-function draw(){
+if(users[u]===p){
 
-ctx.fillStyle="rgba(0,0,0,0.05)";
-ctx.fillRect(0,0,canvas.width,canvas.height);
+document.getElementById("login").style.display="none";
+document.getElementById("forum").style.display="block";
+document.getElementById("user").innerHTML=u;
 
-ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--primary');
-ctx.font=fontSize+"px monospace";
+}else{
 
-for(let i=0;i<drops.length;i++){
-
-const text=letters[Math.floor(Math.random()*letters.length)];
-
-ctx.fillText(text,i*fontSize,drops[i]*fontSize);
-
-if(drops[i]*fontSize>canvas.height && Math.random()>0.975){
-drops[i]=0;
-}
-
-drops[i]++;
+document.getElementById("error").innerHTML="Invalid username or password.";
 
 }
 
 }
 
-setInterval(draw,33);
+function logout(){
 
-/* SCROLL COLOR CHANGE */
+document.getElementById("forum").style.display="none";
+document.getElementById("login").style.display="block";
 
-window.addEventListener("scroll",()=>{
-
-const scroll=window.scrollY;
-const max=document.body.scrollHeight-window.innerHeight;
-const progress=scroll/max;
-
-if(progress<0.33){
-
-document.documentElement.style.setProperty('--primary','#00ff88');
-document.documentElement.style.setProperty('--secondary','#0aff9d');
+document.getElementById("username").value="";
+document.getElementById("password").value="";
+document.getElementById("error").innerHTML="";
 
 }
-else if(progress<0.66){
-
-document.documentElement.style.setProperty('--primary','#00e5ff');
-document.documentElement.style.setProperty('--secondary','#66f7ff');
-
-}
-else{
-
-document.documentElement.style.setProperty('--primary','#ff0088');
-document.documentElement.style.setProperty('--secondary','#ff66bb');
-
-}
-
-document.getElementById("scrollHint").style.opacity =
-scroll>100 ? "0" : "1";
-
-});
 
 </script>
 
