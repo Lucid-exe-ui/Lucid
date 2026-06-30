@@ -1,448 +1,273 @@
-<!DOCTYPE html>
-<html lang="en">
-<html>
-<head>
-<meta charset="UTF-8">
-<meta charset="utf-8">
-<title>Lucid Archive Forum</title>
-
-<style>
-body {
-  margin: 0;
-  background: #0b0b0b;
-  color: #ddd;
-  font-family: Arial, sans-serif;
+    font-weight:bold;
 }
 
-header {
-  background: #111;
-  padding: 15px;
-  font-size: 20px;
-  font-weight: bold;
-  border-bottom: 2px solid #39ff14;
+.logo span{
+    color:#8bc53f;
+}
+.logo span{ color:#8bc53f; }
+
+.nav{
+    background:#3a3a3a;
+    border:1px solid #444;
+    padding:10px;
+    display:flex;
+    gap:10px;
 }
 
-.container {
-  width: 900px;
-  margin: auto;
-  padding: 20px;
+.nav button{
+@@ -50,7 +50,6 @@
+    border:none;
+    padding:8px 15px;
+    cursor:pointer;
+    margin-right:10px;
 }
 
-.card {
-  background: #161616;
-  border: 1px solid #2a2a2a;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 5px;
+.box{
+@@ -69,20 +68,20 @@
+    padding:20px;
 }
 
-.title {
-  color: #39ff14;
-  font-weight: bold;
-  font-size: 16px;
+input{
+    width:260px;
+input, textarea{
+    width:100%;
+    padding:8px;
+    margin-bottom:10px;
+    background:#181818;
+    border:1px solid #555;
+    color:white;
+    margin-bottom:10px;
 }
 
-.small {
-  font-size: 12px;
-  color: #aaa;
+button{
+    background:#6ca52d;
+    color:white;
+    border:none;
+    padding:10px 25px;
+    padding:10px 20px;
+    cursor:pointer;
 }
 
-input, textarea {
-  width: 100%;
-  margin: 5px 0;
-  padding: 8px;
-  background: #0f0f0f;
-  border: 1px solid #333;
-  color: white;
+@@ -100,25 +99,23 @@
 }
 
-button {
-  padding: 6px 10px;
-  background: #39ff14;
-  border: none;
-  cursor: pointer;
-  color: black;
-  font-weight: bold;
+.threadInfo{
+    color:#9b9b9b;
+    font-size:13px;
+    color:#999;
+    font-size:12px;
+    margin-top:5px;
 }
 
-button:hover {
-  background: #2bd10f;
+.threadText{
+    margin-top:10px;
+    white-space:pre-wrap;
 }
 
-.post-content {
-  margin-top: 5px;
-  white-space: pre-wrap;
-}
+#forum{ display:none; }
 
-a {
-  color: #4da3ff;
+.error{
+    color:#ff6666;
+    margin-top:10px;
 }
+.error{ color:#ff6666; margin-top:10px; }
 
-iframe {
-  width: 100%;
-  height: 315px;
-  margin-top: 10px;
+.topbar{
+    display:flex;
+    justify-content:space-between;
+#createBox{
+    display:none;
+    margin-top:15px;
 }
 </style>
 </head>
-
-<body>
-
-<header>Lucid Archive Forum</header>
-
-<div class="container">
-
-<div id="authBox">
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <button onclick="register()">Register</button>
+@@ -132,7 +129,7 @@
 </div>
 
-<div id="forum" style="display:none;">
-
-<h3 id="welcome"></h3>
-
-<div class="card">
-  <input id="title" placeholder="Thread title">
-  <textarea id="content" placeholder="Write post..."></textarea>
-  <button onclick="createThread()">Post Thread</button>
+<div class="nav">
+<button onclick="createPost()">New Thread</button>
+<button onclick="showCreate()">New Thread</button>
+<button onclick="logout()">Logout</button>
 </div>
 
-<div id="posts"></div>
+@@ -143,7 +140,7 @@
+<div class="content">
 
-</div>
+Email<br>
+<input id="username"><br>
+<input id="email"><br>
 
-</div>
+Password<br>
+<input id="password" type="password"><br>
+@@ -159,16 +156,29 @@
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import {
-@@ -18,17 +127,19 @@
-  collection,
-  addDoc,
-  onSnapshot,
-  deleteDoc,
-  doc,
-  setDoc,
-  getDoc,
-  deleteDoc
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+<!-- FORUM -->
+<div id="forum">
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCK-Zi5f2v8DXNbJQ9_yfwv2V43SzqecYI",
-  apiKey: "YOUR_KEY",
-  authDomain: "lucidarchiveforum.firebaseapp.com",
-  projectId: "lucidarchiveforum",
-  appId: "1:614045519869:web:5e4646a29f5f18d98c1394"
-  storageBucket: "lucidarchiveforum.appspot.com",
-  messagingSenderId: "614045519869",
-  appId: "YOUR_APP_ID"
-};
+<div class="box">
+<div class="boxTitle">Welcome <span id="user"></span></div>
+<div class="content">
 
-const app = initializeApp(firebaseConfig);
-@@ -39,212 +150,140 @@
-let isAdmin = false;
-let isBanned = false;
-
-/* ================= AUTH ================= */
-
-window.login = async function () {
-  const email = document.getElementById("username").value;
-  const pass = document.getElementById("password").value;
-
-  try {
-    await signInWithEmailAndPassword(auth, email, pass);
-  } catch (e) {
-    document.getElementById("error").innerText = e.message;
-  }
-/* AUTH */
-window.login = async () => {
-  await signInWithEmailAndPassword(auth,
-    email.value, password.value);
-};
-
-window.register = async function () {
-  const email = document.getElementById("username").value;
-  const pass = document.getElementById("password").value;
-
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-
-    await setDoc(doc(db, "users", cred.user.uid), {
-      email,
-      banned: false
-    });
-  } catch (e) {
-    document.getElementById("error").innerText = e.message;
-  }
-};
-
-window.logout = function () {
-  location.reload();
-window.register = async () => {
-  await createUserWithEmailAndPassword(auth,
-    email.value, password.value);
-};
-
-/* ================= USER STATE ================= */
-
-/* CHECK USER */
-onAuthStateChanged(auth, async (user) => {
-  if (!user) return;
-
-  currentUser = user;
-  isAdmin = user.email === "admin@lucid.me.uk";
-
-  const userDoc = await getDoc(doc(db, "users", user.uid));
-  document.getElementById("authBox").style.display = "none";
-  document.getElementById("forum").style.display = "block";
-
-  if (userDoc.exists()) {
-    isBanned = userDoc.data().banned;
-  }
-  document.getElementById("welcome").innerText =
-    "Welcome " + user.email;
-
-  document.getElementById("login").style.display = "none";
-  document.getElementById("forum").style.display = "block";
-  document.getElementById("user").innerText = user.email;
-  // user doc
-  const ref = doc(db, "users", user.email);
-  const snap = await getDoc(ref);
-
-  if (isBanned) {
-    document.getElementById("banNotice").style.display = "block";
-  if (!snap.exists()) {
-    await setDoc(ref, {
-      banned: false,
-      role: user.email === "admin@lucid.me.uk" ? "admin" : "user"
-    });
-  }
-
-  loadThreads();
-});
-  const data = (await getDoc(ref)).data();
-
-/* ================= THREADS ================= */
-  isAdmin = data.role === "admin";
-  isBanned = data.banned;
-
-window.createThread = async function () {
-  if (isBanned) return alert("You are banned");
-  loadPosts();
-});
-
-  const title = document.getElementById("title").value;
-  const text = document.getElementById("text").value;
-/* CREATE THREAD */
-window.createThread = async () => {
-  if (isBanned) return alert("You are banned");
-
-  await addDoc(collection(db, "threads"), {
-    title,
-    text,
-  await addDoc(collection(db, "posts"), {
-    title: title.value,
-    content: content.value,
-    user: currentUser.email,
-    time: Date.now()
-  });
-};
-
-function loadThreads() {
-  onSnapshot(collection(db, "threads"), (snap) => {
-    const box = document.getElementById("threads");
-    box.innerHTML = "";
-
-    snap.forEach(docu => {
-      const d = docu.data();
-  title.value = "";
-  content.value = "";
-};
-
-      const div = document.createElement("div");
-      div.className = "thread";
-/* DELETE */
-window.deletePost = async (id) => {
-  await deleteDoc(doc(db, "posts", id));
-};
-
-      div.innerHTML = `
-        <div class="threadTitle">${d.title}</div>
-        <div class="threadInfo">Posted by ${d.user}</div>
-        <div class="threadText">${render(d.text)}</div>
-        ${isAdmin ? `<button onclick="delThread('${docu.id}')">Delete</button>` : ""}
-        ${isAdmin ? `<button onclick="banUser('${d.user}')">Ban User</button>` : ""}
-      `;
-/* BAN */
-window.banUser = async (email) => {
-  if (!isAdmin) return;
-
-      box.appendChild(div);
-    });
-  await setDoc(doc(db, "users", email), {
-    banned: true,
-    role: "user"
-  });
-}
-
-window.delThread = async function (id) {
-  await deleteDoc(doc(db, "threads", id));
-  alert("User banned");
-};
-
-window.banUser = async function (email) {
-  const usersSnap = await getDocs(collection(db, "users"));
-/* LOAD POSTS */
-function loadPosts() {
-  onSnapshot(collection(db, "posts"), (snap) => {
-    posts.innerHTML = "";
-
-  usersSnap.forEach(async u => {
-    if (u.data().email === email) {
-      await setDoc(doc(db, "users", u.id), {
-        ...u.data(),
-        banned: true
-      });
-    }
-  });
-    snap.forEach(docu => {
-      const d = docu.data();
-
-  alert("User banned");
-};
-      let html = formatContent(d.content);
-
-/* ================= RENDER ENGINE ================= */
-      let post = document.createElement("div");
-      post.className = "card";
-
-function render(text) {
-  if (!text) return "";
-      post.innerHTML = `
-        <div class="title">${d.title}</div>
-        <div class="small">Posted by ${d.user}</div>
-        <div class="post-content">${html}</div>
-      `;
-
-  let html = text;
-      if (isAdmin) {
-        post.innerHTML += `
-          <button onclick="deletePost('${docu.id}')">Delete</button>
-          <button onclick="banUser('${d.user}')">Ban User</button>
-        `;
-      }
-
-  /* escape */
-  html = html.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      posts.appendChild(post);
-    });
-  });
-}
-
-  /* markdown */
-  html = html.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
-  html = html.replace(/\*(.*?)\*/g, "<i>$1</i>");
-/* EMBEDS + MARKDOWN FIX */
-function formatContent(text) {
-
-  /* links */
-  html = html.replace(
-  // links
-  text = text.replace(
-    /(https?:\/\/[^\s]+)/g,
-    `<a href="$1" target="_blank">$1</a>`
-    url => {
-      if (url.includes("youtube.com/watch")) {
-        const id = url.split("v=")[1];
-        return `<iframe src="https://www.youtube.com/embed/${id}" frameborder="0"></iframe>`;
-      }
-
-      if (url.includes("youtu.be")) {
-        const id = url.split("/").pop();
-        return `<iframe src="https://www.youtube.com/embed/${id}" frameborder="0"></iframe>`;
-      }
-
-      return `<a href="${url}" target="_blank">${url}</a>`;
-    }
-  );
-
-  /* youtube */
-  html = html.replace(
-    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/g,
-    `<iframe width="320" height="180"
-      src="https://www.youtube.com/embed/$1"
-      frameborder="0" allowfullscreen></iframe>`
-  );
-  // bold
-  text = text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
-
-  /* images */
-  html = html.replace(
-    /(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/g,
-    `<img src="$1" style="max-width:300px;border-radius:6px;">`
-  );
-  // line breaks
-  text = text.replace(/\n/g, "<br>");
-
-  /* discord embeds */
-  html = html.replace(
-    /(https?:\/\/discord\.gg\/[^\s]+)/g,
-    `<div class="discord">Discord Invite: <a href="$1">$1</a></div>`
-  );
-
-  return html;
-  return text;
-}
-</script>
-
-<style>
-body{background:#111;color:#ddd;font-family:Arial}
-.wrapper{width:900px;margin:auto}
-.thread{background:#222;padding:10px;margin:10px 0;border:1px solid #444}
-.threadTitle{color:#8bc53f;font-size:18px}
-.threadText img{max-width:100%}
-.discord{background:#2b2f3a;padding:8px;margin-top:5px}
-button{margin-top:5px}
-#banNotice{display:none;background:red;padding:10px;margin:10px 0}
-</style>
-</head>
-
-<body>
-
-<div class="wrapper">
-
-<div id="login">
-<h2>Login</h2>
-<input id="username" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-
-<button onclick="login()">Login</button>
-<button onclick="register()">Register</button>
-
-<div id="error"></div>
-</div>
-
-<div id="forum" style="display:none">
-
-<h2>Welcome <span id="user"></span></h2>
-
-<div id="banNotice">
-🚫 You are banned. You can view posts but cannot create threads.
-</div>
-
-<input id="title" placeholder="Thread title"><br>
-<textarea id="text" placeholder="Write post..."></textarea><br>
-
+<div class="content" id="posts"></div>
+<!-- CREATE THREAD -->
+<div id="createBox">
+<h3>Create Thread</h3>
+<input id="title" placeholder="Thread title">
+<textarea id="content" placeholder="Write your thread..."></textarea>
 <button onclick="createThread()">Post Thread</button>
+</div>
 
+<!-- THREADS -->
 <div id="threads"></div>
 
 </div>
+</div>
 
 </div>
 
-</body>
-</html>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+@@ -185,7 +195,8 @@
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+const firebaseConfig = {
+@@ -201,78 +212,91 @@
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+/* LOGIN */
+window.login = async function () {
+    const email = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+
+/* AUTH STATE (fixes refresh logout bug) */
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("forum").style.display = "block";
+        document.getElementById("user").innerText = email;
+        document.getElementById("user").innerText = user.email;
+
+        loadPosts();
+        loadThreads();
+    } else {
+        document.getElementById("login").style.display = "block";
+        document.getElementById("forum").style.display = "none";
+    }
+});
+
+    } catch (err) {
+        document.getElementById("error").innerText = err.message;
+/* LOGIN */
+window.login = async function () {
+    try {
+        await signInWithEmailAndPassword(
+            auth,
+            document.getElementById("email").value,
+            document.getElementById("password").value
+        );
+    } catch (e) {
+        document.getElementById("error").innerText = e.message;
+    }
+};
+
+/* REGISTER */
+window.register = async function () {
+    const email = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        document.getElementById("error").innerText = "Account created! Now login.";
+    } catch (err) {
+        document.getElementById("error").innerText = err.message;
+        await createUserWithEmailAndPassword(
+            auth,
+            document.getElementById("email").value,
+            document.getElementById("password").value
+        );
+    } catch (e) {
+        document.getElementById("error").innerText = e.message;
+    }
+};
+
+/* LOGOUT */
+window.logout = async function () {
+    await signOut(auth);
+};
+
+    document.getElementById("forum").style.display = "none";
+    document.getElementById("login").style.display = "block";
+/* SHOW CREATE BOX */
+window.showCreate = function () {
+    document.getElementById("createBox").style.display = "block";
+};
+
+/* CREATE THREAD */
+window.createPost = async function () {
+    const title = prompt("Thread title:");
+    const text = prompt("Thread content:");
+window.createThread = async function () {
+    const title = document.getElementById("title").value;
+    const content = document.getElementById("content").value;
+
+    if (!title || !text) return;
+    if (!title || !content) return;
+
+    await addDoc(collection(db, "posts"), {
+    await addDoc(collection(db, "threads"), {
+        user: auth.currentUser.email,
+        title,
+        text,
+        content,
+        time: Date.now()
+    });
+};
+
+/* LOAD POSTS */
+function loadPosts() {
+    const postsDiv = document.getElementById("posts");
+    document.getElementById("title").value = "";
+    document.getElementById("content").value = "";
+    document.getElementById("createBox").style.display = "none";
+};
+
+    const q = query(collection(db, "posts"), orderBy("time", "desc"));
+/* LOAD THREADS */
+function loadThreads() {
+    const q = query(collection(db, "threads"), orderBy("time", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+        postsDiv.innerHTML = "";
+        const container = document.getElementById("threads");
+        container.innerHTML = "";
+
+        snapshot.forEach((doc) => {
+            const p = doc.data();
+        snapshot.forEach(doc => {
+            const t = doc.data();
+
+            postsDiv.innerHTML += `
+            container.innerHTML += `
+                <div class="thread">
+                    <div class="threadTitle">${p.title}</div>
+                    <div class="threadInfo">Posted by ${p.user}</div>
+                    <div class="threadText">${p.text}</div>
+                    <div class="threadTitle">${t.title}</div>
+                    <div class="threadInfo">Posted by ${t.user}</div>
+                    <div class="threadText">${t.content}</div>
+                </div>
+            `;
+        });
