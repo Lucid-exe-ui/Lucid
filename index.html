@@ -1,250 +1,54 @@
-<!DOCTYPE html>
+from textwrap import dedent
+
+html = dedent("""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lucid Archive Forum</title>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot,
-  doc,
-  setDoc,
-  getDoc,
-  deleteDoc
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCK-Zi5f2v8DXNbJQ9_yfwv2V43SzqecYI",
-  authDomain: "lucidarchiveforum.firebaseapp.com",
-  projectId: "lucidarchiveforum",
-  appId: "1:614045519869:web:5e4646a29f5f18d98c1394"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let currentUser = null;
-let isAdmin = false;
-let isBanned = false;
-
-/* ================= AUTH ================= */
-
-window.login = async function () {
-  const email = document.getElementById("username").value;
-  const pass = document.getElementById("password").value;
-
-  try {
-    await signInWithEmailAndPassword(auth, email, pass);
-  } catch (e) {
-    document.getElementById("error").innerText = e.message;
-  }
-};
-
-window.register = async function () {
-  const email = document.getElementById("username").value;
-  const pass = document.getElementById("password").value;
-
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-
-    await setDoc(doc(db, "users", cred.user.uid), {
-      email,
-      banned: false
-    });
-  } catch (e) {
-    document.getElementById("error").innerText = e.message;
-  }
-};
-
-window.logout = function () {
-  location.reload();
-};
-
-/* ================= USER STATE ================= */
-
-onAuthStateChanged(auth, async (user) => {
-  if (!user) return;
-
-  currentUser = user;
-  isAdmin = user.email === "admin@lucid.me.uk";
-
-  const userDoc = await getDoc(doc(db, "users", user.uid));
-
-  if (userDoc.exists()) {
-    isBanned = userDoc.data().banned;
-  }
-
-  document.getElementById("login").style.display = "none";
-  document.getElementById("forum").style.display = "block";
-  document.getElementById("user").innerText = user.email;
-
-  if (isBanned) {
-    document.getElementById("banNotice").style.display = "block";
-  }
-
-  loadThreads();
-});
-
-/* ================= THREADS ================= */
-
-window.createThread = async function () {
-  if (isBanned) return alert("You are banned");
-
-  const title = document.getElementById("title").value;
-  const text = document.getElementById("text").value;
-
-  await addDoc(collection(db, "threads"), {
-    title,
-    text,
-    user: currentUser.email,
-    time: Date.now()
-  });
-};
-
-function loadThreads() {
-  onSnapshot(collection(db, "threads"), (snap) => {
-    const box = document.getElementById("threads");
-    box.innerHTML = "";
-
-    snap.forEach(docu => {
-      const d = docu.data();
-
-      const div = document.createElement("div");
-      div.className = "thread";
-
-      div.innerHTML = `
-        <div class="threadTitle">${d.title}</div>
-        <div class="threadInfo">Posted by ${d.user}</div>
-        <div class="threadText">${render(d.text)}</div>
-        ${isAdmin ? `<button onclick="delThread('${docu.id}')">Delete</button>` : ""}
-        ${isAdmin ? `<button onclick="banUser('${d.user}')">Ban User</button>` : ""}
-      `;
-
-      box.appendChild(div);
-    });
-  });
-}
-
-window.delThread = async function (id) {
-  await deleteDoc(doc(db, "threads", id));
-};
-
-window.banUser = async function (email) {
-  const usersSnap = await getDocs(collection(db, "users"));
-
-  usersSnap.forEach(async u => {
-    if (u.data().email === email) {
-      await setDoc(doc(db, "users", u.id), {
-        ...u.data(),
-        banned: true
-      });
-    }
-  });
-
-  alert("User banned");
-};
-
-/* ================= RENDER ENGINE ================= */
-
-function render(text) {
-  if (!text) return "";
-
-  let html = text;
-
-  /* escape */
-  html = html.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-  /* markdown */
-  html = html.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
-  html = html.replace(/\*(.*?)\*/g, "<i>$1</i>");
-
-  /* links */
-  html = html.replace(
-    /(https?:\/\/[^\s]+)/g,
-    `<a href="$1" target="_blank">$1</a>`
-  );
-
-  /* youtube */
-  html = html.replace(
-    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/g,
-    `<iframe width="320" height="180"
-      src="https://www.youtube.com/embed/$1"
-      frameborder="0" allowfullscreen></iframe>`
-  );
-
-  /* images */
-  html = html.replace(
-    /(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/g,
-    `<img src="$1" style="max-width:300px;border-radius:6px;">`
-  );
-
-  /* discord embeds */
-  html = html.replace(
-    /(https?:\/\/discord\.gg\/[^\s]+)/g,
-    `<div class="discord">Discord Invite: <a href="$1">$1</a></div>`
-  );
-
-  return html;
-}
-</script>
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Neon Glass Landing</title>
 <style>
-body{background:#111;color:#ddd;font-family:Arial}
-.wrapper{width:900px;margin:auto}
-.thread{background:#222;padding:10px;margin:10px 0;border:1px solid #444}
-.threadTitle{color:#8bc53f;font-size:18px}
-.threadText img{max-width:100%}
-.discord{background:#2b2f3a;padding:8px;margin-top:5px}
-button{margin-top:5px}
-#banNotice{display:none;background:red;padding:10px;margin:10px 0}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;background:#070b16;color:#fff;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:-20%;background:radial-gradient(circle at 30% 30%,#4f7cff55,transparent 30%),radial-gradient(circle at 70% 60%,#9b5cff55,transparent 30%);filter:blur(80px);animation:move 12s ease-in-out infinite alternate;z-index:-2}
+@keyframes move{to{transform:translate(5%,5%) scale(1.2)}}
+nav{display:flex;justify-content:space-between;padding:24px 8vw;position:fixed;width:100%;backdrop-filter:blur(12px);background:#0004}
+nav a{color:#fff;text-decoration:none;margin:0 12px}
+.hero{height:100vh;display:grid;place-items:center;text-align:center;padding:20px}
+h1{font-size:4rem;background:linear-gradient(90deg,#8cf,#b6f);-webkit-background-clip:text;color:transparent}
+p{max-width:700px;opacity:.8;margin:20px auto}
+.btn{display:inline-block;padding:14px 28px;border-radius:999px;background:#6f6cff;color:#fff;text-decoration:none;transition:.3s}
+.btn:hover{transform:translateY(-4px);box-shadow:0 0 30px #6f6cff}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;padding:80px 8vw}
+.card{background:#ffffff10;border:1px solid #ffffff20;border-radius:20px;padding:30px;backdrop-filter:blur(15px);transition:.3s}
+.card:hover{transform:translateY(-8px) scale(1.02)}
+footer{text-align:center;padding:60px;opacity:.6}
+.reveal{opacity:0;transform:translateY(40px);transition:1s}
+.reveal.show{opacity:1;transform:none}
 </style>
 </head>
-
 <body>
-
-<div class="wrapper">
-
-<div id="login">
-<h2>Login</h2>
-<input id="username" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-
-<button onclick="login()">Login</button>
-<button onclick="register()">Register</button>
-
-<div id="error"></div>
+<nav><strong>YOUR LOGO</strong><div><a href="#">Home</a><a href="#">Features</a><a href="#">Contact</a></div></nav>
+<section class="hero">
+<div class="reveal">
+<h1>Future Starts Here</h1>
+<p>An original futuristic glassmorphism landing page inspired by modern cyber-style design trends, with smooth animations and responsive layout.</p>
+<a class="btn" href="#">Get Started</a>
 </div>
-
-<div id="forum" style="display:none">
-
-<h2>Welcome <span id="user"></span></h2>
-
-<div id="banNotice">
-🚫 You are banned. You can view posts but cannot create threads.
-</div>
-
-<input id="title" placeholder="Thread title"><br>
-<textarea id="text" placeholder="Write post..."></textarea><br>
-
-<button onclick="createThread()">Post Thread</button>
-
-<div id="threads"></div>
-
-</div>
-
-</div>
-
+</section>
+<section class="grid">
+<div class="card reveal"><h2>Fast</h2><p>Optimized single-file HTML.</p></div>
+<div class="card reveal"><h2>Modern</h2><p>Glassmorphism UI and animated gradients.</p></div>
+<div class="card reveal"><h2>Responsive</h2><p>Works on desktop and mobile.</p></div>
+<div class="card reveal"><h2>Animated</h2><p>Scroll reveals and hover effects.</p></div>
+<div class="card reveal"><h2>Customizable</h2><p>Edit colors and sections easily.</p></div>
+<div class="card reveal"><h2>Original</h2><p>Inspired by the style, not copied.</p></div>
+</section>
+<footer>© 2026 Your Website</footer>
+<script>
+const obs=new IntersectionObserver(e=>e.forEach(x=>x.isIntersecting&&x.target.classList.add("show")), {threshold:.15});
+document.querySelectorAll(".reveal").forEach(el=>obs.observe(el));
+</script>
 </body>
-</html>
+</html>""")
+open("/mnt/data/index.html","w",encoding="utf8").write(html)
+open("/mnt/data/index.txt","w",encoding="utf8").write(html)
+print("done")
