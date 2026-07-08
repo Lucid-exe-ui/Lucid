@@ -1,481 +1,149 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>FiveM Visual Editor</title>
-<title>FiveM XML Editor</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invite Only Cheat Login</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #181a1f;
+      color: #eee;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-<style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:Arial; }
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial;
-}
+    .container {
+      background-color: #242629;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      width: 400px;
+    }
 
-body {
-    background:#0a0a0a;
-    color:white;
-    overflow:hidden;
-    background: #0a0a0a;
-    color: white;
-    overflow: hidden;
-}
+    h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      font-weight: normal;
+    }
 
-/* Background */
-/* BACKGROUND CANVAS */
-canvas {
-    position:fixed;
-    top:0;
-    left:0;
-    z-index:-1;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: -1;
-}
+    .input-group {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
 
-/* Sidebar */
-/* SIDEBAR */
-.sidebar {
-    position:fixed;
-    left:0;
-    top:0;
-    width:70px;
-    height:100%;
-    background:rgba(20,20,20,0.8);
-    backdrop-filter:blur(10px);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    padding-top:20px;
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 70px;
-    height: 100%;
-    background: rgba(20,20,20,0.85);
-    backdrop-filter: blur(10px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 20px;
-}
+    .input-group label {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 5px;
+    }
 
-.icon {
-    width:40px;
-    height:40px;
-    margin:10px 0;
-    background:rgba(255,0,0,0.2);
-    border-radius:10px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    transition:.3s;
-    width: 40px;
-    height: 40px;
-    margin: 10px 0;
-    background: rgba(255,0,0,0.2);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: 0.3s;
-}
+    input {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #3a3c42;
+      background-color: #1e1f23;
+      color: #eee;
+      font-size: 14px;
+    }
 
-.icon:hover { background:red; transform:scale(1.1); }
-.icon:hover {
-    background: red;
-    transform: scale(1.1);
-}
+    input::placeholder {
+      color: #555;
+    }
 
-/* Main */
-/* MAIN */
-.main {
-    margin-left:90px;
-    padding:30px;
-    margin-left: 90px;
-    padding: 30px;
-}
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #3a80f7;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
 
-.panel {
-    display:none;
-    background:rgba(30,30,30,0.6);
-    backdrop-filter:blur(15px);
-    padding:20px;
-    border-radius:15px;
-    width:420px;
-    box-shadow:0 0 20px rgba(255,0,0,0.2);
-    display: none;
-    background: rgba(30,30,30,0.6);
-    backdrop-filter: blur(15px);
-    padding: 20px;
-    border-radius: 15px;
-    width: 420px;
-    box-shadow: 0 0 20px rgba(255,0,0,0.2);
-}
+    button:hover {
+      background-color: #2a65c7;
+    }
 
-.active { display:block; }
-.active {
-    display: block;
-}
+    .message {
+      margin-top: 10px;
+      color: #ff4c4c;
+      font-size: 14px;
+      text-align: center;
+    }
 
-input, select, button {
-    width:100%;
-    margin:10px 0;
-    padding:10px;
-    border-radius:8px;
-    border:none;
-    width: 100%;
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-}
-
-button {
-    background:red;
-    color:white;
-    cursor:pointer;
-    background: red;
-    color: white;
-    cursor: pointer;
-}
-
-.preview {
-    height:100px;
-    border-radius:10px;
-    margin-top:10px;
-/* FILE LABEL */
-#fileName {
-    font-size: 12px;
-    opacity: 0.7;
-}
-</style>
+    .toggle-btn {
+      margin-top: 15px;
+      background: transparent;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 14px;
+    }
+  </style>
 </head>
-@@ -95,164 +105,235 @@
+<body>
+  <div class="container" id="login-container">
+    <h1>Log In</h1>
+    <div class="input-group">
+      <label for="login-email">Your name or email address:</label>
+      <input type="text" id="login-email" placeholder="Email or Username">
+    </div>
+    <div class="input-group">
+      <label for="login-password">Password:</label>
+      <input type="password" id="login-password" placeholder="Password">
+    </div>
+    <button onclick="fakeLogin()">Log in</button>
+    <div class="message" id="login-message"></div>
+    <button class="toggle-btn" onclick="showSignup()">Don't have an account? Register now</button>
+  </div>
 
-<canvas id="bg"></canvas>
+  <div class="container" id="signup-container" style="display:none;">
+    <h1>Register</h1>
+    <div class="input-group">
+      <label for="signup-email">Email:</label>
+      <input type="text" id="signup-email" placeholder="Email">
+    </div>
+    <div class="input-group">
+      <label for="signup-password">Password:</label>
+      <input type="password" id="signup-password" placeholder="Password">
+    </div>
+    <div class="input-group">
+      <label for="signup-invite">Invite Code:</label>
+      <input type="text" id="signup-invite" placeholder="Invite Code">
+    </div>
+    <button onclick="fakeSignup()">Register</button>
+    <div class="message" id="signup-message"></div>
+    <button class="toggle-btn" onclick="showLogin()">Already have an account? Log in</button>
+  </div>
 
-<!-- Sidebar -->
-<!-- SIDEBAR -->
-<div class="sidebar">
-    <div class="icon" onclick="show('upload')">📂</div>
-    <div class="icon" onclick="show('weather')">🌤</div>
-    <div class="icon" onclick="show('lightning')">⚡</div>
-    <div class="icon" onclick="show('ped')">👤</div>
-    <div class="icon" onclick="show('water')">🌊</div>
-    <div class="icon" onclick="show('time')">🕒</div>
-    <div class="icon" onclick="show('clouds')">☁️</div>
-    <div class="icon" onclick="show('color')">🎨</div>
-    <div class="icon" onclick="show('sky')">🖼</div>
-    <div class="icon" onclick="show('export')">📦</div>
-</div>
-
-<!-- MAIN -->
-<div class="main">
-
-<!-- UPLOAD -->
-<div id="upload" class="panel active">
-<h2>Upload Citizen / Timecycle</h2>
-<input type="file" id="fileInput">
-<p id="fileName"></p>
-    <h2>Upload XML</h2>
-    <input type="file" id="fileInput">
-    <p id="fileName"></p>
-</div>
-
-<!-- WEATHER -->
-<div id="weather" class="panel">
-<h2>Weather</h2>
-<select id="weatherVal">
-<option>CLEAR</option>
-<option>RAIN</option>
-<option>THUNDER</option>
-<option>FOG</option>
-</select>
-    <h2>Weather</h2>
-    <select id="weatherVal">
-        <option>CLEAR</option>
-        <option>RAIN</option>
-        <option>THUNDER</option>
-        <option>FOG</option>
-    </select>
-</div>
-
-<!-- LIGHTNING -->
-<div id="lightning" class="panel">
-<h2>Lightning</h2>
-<input type="color" id="lightColor">
-</div>
-
-<!-- PED -->
-<div id="ped" class="panel">
-<h2>Ped Glow (UI only)</h2>
-<input type="color" id="pedColor">
-<input type="range" id="pedIntensity" min="0" max="50">
-</div>
-
-<!-- WATER -->
-<div id="water" class="panel">
-<h2>Water Effects (UI only)</h2>
-<input type="color" id="waterColor">
-    <h2>Lightning Color</h2>
-    <input type="color" id="lightColor">
-</div>
-
-<!-- TIME -->
-<div id="time" class="panel">
-<h2>Day/Night</h2>
-<input type="range" id="timeVal" min="0" max="24">
-    <h2>Day / Night Cycle</h2>
-    <input type="range" min="0" max="24" id="timeVal">
-</div>
-
-<!-- CLOUDS -->
-<div id="clouds" class="panel">
-<h2>Clouds</h2>
-<select id="cloudVal">
-<option>Default</option>
-<option>Storm</option>
-<option>Clear</option>
-</select>
-</div>
-
-<!-- COLOR -->
-<div id="color" class="panel">
-<h2>Color Keyframes (UI only)</h2>
-<input type="color" id="color1">
-<input type="color" id="color2">
-</div>
-
-<!-- SKY -->
-<div id="sky" class="panel">
-<h2>PNG Skybox</h2>
-<input type="file" id="skyFile" accept="image/png">
-    <h2>Clouds</h2>
-    <select id="cloudVal">
-        <option>Default</option>
-        <option>Storm</option>
-        <option>Clear</option>
-        <option>Foggy</option>
-    </select>
-</div>
-
-<!-- EXPORT -->
-<div id="export" class="panel">
-<h2>Export Edited File</h2>
-<button onclick="exportFile()">Download File</button>
-    <h2>Export XML</h2>
-    <button onclick="exportFile()">Download Edited XML</button>
-</div>
-
-</div>
-
-<script>
-// PANEL SWITCH
-/* =========================
-   XML SYSTEM
-========================= */
-let xmlDoc = null;
-let rawXML = "";
-
-/* =========================
-   SETTINGS
-========================= */
-const settings = {
-    weather: "CLEAR",
-    time: 12,
-    clouds: "Default",
-    lightning: "#ffffff"
-};
-
-/* =========================
-   SWITCH PANELS
-========================= */
-function show(id) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.panel')
-        .forEach(p => p.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-}
-
-// FILE STORAGE
-let uploadedContent = "";
-/* =========================
-   UPLOAD XML
-========================= */
-document.getElementById("fileInput").addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-// UPLOAD
-document.getElementById("fileInput").addEventListener("change", function(e){
-    let file = e.target.files[0];
-    document.getElementById("fileName").innerText = file.name;
-
-    let reader = new FileReader();
-    reader.onload = function(e){
-        uploadedContent = e.target.result;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-        rawXML = ev.target.result;
-
-        const parser = new DOMParser();
-        xmlDoc = parser.parseFromString(rawXML, "application/xml");
-    };
-
-    reader.readAsText(file);
-});
-
-// EXPORT
-/* =========================
-   UI → SETTINGS
-========================= */
-document.getElementById("weatherVal").onchange = e => {
-    settings.weather = e.target.value;
-};
-
-document.getElementById("timeVal").oninput = e => {
-    settings.time = e.target.value;
-};
-
-document.getElementById("cloudVal").onchange = e => {
-    settings.clouds = e.target.value;
-};
-
-document.getElementById("lightColor").oninput = e => {
-    settings.lightning = e.target.value;
-};
-
-/* =========================
-   APPLY XML CHANGES
-========================= */
-function applyXML() {
-    if (!xmlDoc) return;
-
-    function set(tag, value) {
-        let node = xmlDoc.getElementsByTagName(tag)[0];
-
-        if (!node) {
-            node = xmlDoc.createElement(tag);
-            xmlDoc.documentElement.appendChild(node);
-        }
-
-        node.textContent = value;
+  <script>
+    function showSignup() {
+      document.getElementById('login-container').style.display = 'none';
+      document.getElementById('signup-container').style.display = 'block';
     }
 
-    set("weatherType", settings.weather);
-    set("timeOfDay", settings.time);
-    set("cloudType", settings.clouds);
-    set("lightningColor", settings.lightning);
-}
-
-/* =========================
-   EXPORT XML
-========================= */
-function exportFile() {
-    if (!uploadedContent) {
-        alert("Upload a file first");
-    if (!xmlDoc) {
-        alert("Upload XML first");
-        return;
+    function showLogin() {
+      document.getElementById('signup-container').style.display = 'none';
+      document.getElementById('login-container').style.display = 'block';
     }
 
-    let edited = uploadedContent + "\n\n--- Edited Settings ---\n";
-    edited += "Weather: " + document.getElementById("weatherVal").value + "\n";
-    edited += "Time: " + document.getElementById("timeVal").value + "\n";
-    edited += "Clouds: " + document.getElementById("cloudVal").value + "\n";
-    edited += "Lightning: " + document.getElementById("lightColor").value + "\n";
-    applyXML();
-
-    const serializer = new XMLSerializer();
-    const output = serializer.serializeToString(xmlDoc);
-
-    const blob = new Blob([output], { type: "application/xml" });
-
-    const blob = new Blob([edited]);
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "edited_timecycle.txt";
-    a.download = "edited_fivem.xml";
-    a.click();
-}
-
-// BACKGROUND
-/* =========================
-   BACKGROUND (CONNECTED NODES)
-========================= */
-const canvas = document.getElementById("bg");
-const ctx = canvas.getContext("2d");
-
-canvas.width = innerWidth;
-canvas.height = innerHeight;
-
-let particles = [];
-for (let i=0;i<60;i++){
-    particles.push({
-        x:Math.random()*canvas.width,
-        y:Math.random()*canvas.height,
-        vx:Math.random()-0.5,
-        vy:Math.random()-0.5
-let nodes = [];
-
-for (let i = 0; i < 70; i++) {
-    nodes.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: (Math.random() - 0.5) * 0.6
-    });
-}
-
-function animate(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    particles.forEach(p=>{
-        p.x+=p.vx;
-        p.y+=p.vy;
-        ctx.fillStyle="red";
-        ctx.fillRect(p.x,p.y,2,2);
-    });
-function drawLine(a, b, dist) {
-    ctx.beginPath();
-    ctx.strokeStyle = `rgba(255,0,0,${1 - dist / 160})`;
-    ctx.lineWidth = 1;
-    ctx.moveTo(a.x, a.y);
-    ctx.lineTo(b.x, b.y);
-    ctx.stroke();
-}
-
-function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for (let i = 0; i < nodes.length; i++) {
-        let n = nodes[i];
-
-        n.x += n.vx;
-        n.y += n.vy;
-
-        if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
-        if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
-
-        ctx.fillStyle = "red";
-        ctx.fillRect(n.x, n.y, 2, 2);
-
-        for (let j = i + 1; j < nodes.length; j++) {
-            let n2 = nodes[j];
-            let dx = n.x - n2.x;
-            let dy = n.y - n2.y;
-            let dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < 140) drawLine(n, n2, dist);
-        }
+    function fakeLogin() {
+      document.getElementById('login-message').innerText = "You must be logged-in to do that.";
     }
 
-    requestAnimationFrame(animate);
-}
-
-animate();
-</script>
+    function fakeSignup() {
+      document.getElementById('signup-message').innerText = "Signup failed! Invite code invalid.";
+    }
+  </script>
+</body>
+</html>
